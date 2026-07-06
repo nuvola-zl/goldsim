@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - GoldSim 贵金属交易模拟系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ============================================================
+           【LOGIN-BG-1】登录页全局背景层
+           位置：整个页面最底层
+           功能：深色渐变背景 + 装饰光晕
+           ============================================================ */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 【LOGIN-BG-1-A】右上角装饰光晕 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(201,169,110,0.08) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+            border-radius: 50%;
+        }
+
+        /* 【LOGIN-BG-1-B】左下角装饰光晕 */
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(201,169,110,0.05) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            border-radius: 50%;
+        }
+
+        /* ============================================================
+           【LOGIN-MAIN-1】登录主容器
+           位置：页面中央
+           功能：包裹左右两栏
+           子模块：LOGIN-MAIN-1-A(左侧品牌区), LOGIN-MAIN-1-B(右侧表单区)
+           ============================================================ */
+        .login-container {
+            display: flex;
+            width: 1000px;
+            height: 640px;
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,169,110,0.1);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================================
+           【LOGIN-MAIN-1-A】左侧品牌区
+           位置：主容器左侧
+           功能：品牌展示、平台介绍、特色功能
+           宽度：420px
+           子模块：LOGIN-MAIN-1-A-1(品牌顶部), LOGIN-MAIN-1-A-2(特色功能)
+           ============================================================ */
+        .brand-section {
+            width: 420px;
+            background: linear-gradient(180deg, rgba(201,169,110,0.15) 0%, rgba(26,26,46,0.8) 100%);
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 【LOGIN-MAIN-1-A-0】背景网格纹理 */
+        .brand-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(201,169,110,0.02) 10px,
+                rgba(201,169,110,0.02) 20px
+            );
+            animation: shimmer 20s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* 【LOGIN-MAIN-1-A-1】品牌顶部区域 START */
+        .brand-top {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 【LOGIN-MAIN-1-A-1-1】Logo区域 START */
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 50px;
+        }
+
+        /* 【LOGIN-MAIN-1-A-1-1a】Logo图标 */
+        .brand-logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 8px 32px rgba(201,169,110,0.3);
+        }
+
+        /* 【LOGIN-MAIN-1-A-1-1b】Logo文字 */
+        .brand-logo-text h2 {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .brand-logo-text p {
+            color: rgba(201,169,110,0.8);
+            font-size: 12px;
+            margin-top: 4px;
+            letter-spacing: 4px;
+        }
+
+        /* 【LOGIN-MAIN-1-A-1-1】Logo区域 END */
+
+        /* 【LOGIN-MAIN-1-A-1-2】品牌标题 */
+        .brand-title {
+            color: #fff;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .brand-title span {
+            background: linear-gradient(135deg, #c9a96e 0%, #f0d78c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* 【LOGIN-MAIN-1-A-1-3】品牌描述 */
+        .brand-desc {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* 【LOGIN-MAIN-1-A-1】品牌顶部区域 END */
+
+        /* 【LOGIN-MAIN-1-A-2】特色功能区域 START */
+        .brand-features {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 【LOGIN-MAIN-1-A-2-N】单个特色功能项 */
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+        }
+
+        /* 【LOGIN-MAIN-1-A-2-N-a】功能图标 */
+        .feature-item .icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(201,169,110,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: 1px solid rgba(201,169,110,0.2);
+        }
+
+        /* 【LOGIN-MAIN-1-A-2】特色功能区域 END */
+
+        /* 【LOGIN-MAIN-1-A】左侧品牌区 END */
+
+        /* ============================================================
+           【LOGIN-MAIN-1-B】右侧表单区
+           位置：主容器右侧
+           功能：登录/注册表单
+           子模块：LOGIN-MAIN-1-B-1(表单头部), LOGIN-MAIN-1-B-2(标签切换),
+                  LOGIN-MAIN-1-B-3(登录表单), LOGIN-MAIN-1-B-4(注册表单)
+           ============================================================ */
+        .form-section {
+            flex: 1;
+            padding: 45px 55px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 【LOGIN-MAIN-1-B-1】表单头部 START */
+        .form-header {
+            margin-bottom: 30px;
+        }
+
+        /* 【LOGIN-MAIN-1-B-1a】表单标题 */
+        .form-header h3 {
+            color: #fff;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        /* 【LOGIN-MAIN-1-B-1b】表单副标题 */
+        .form-header p {
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+        }
+
+        /* 【LOGIN-MAIN-1-B-1】表单头部 END */
+
+        /* 【LOGIN-MAIN-1-B-2】登录/注册切换标签 START */
+        .form-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        /* 【LOGIN-MAIN-1-B-2-N】单个标签按钮 */
+        .form-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: none;
+            background: transparent;
+        }
+
+        .form-tab.active {
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(201,169,110,0.3);
+        }
+
+        /* 【LOGIN-MAIN-1-B-2】切换标签 END */
+
+        /* 【LOGIN-MAIN-1-B-3】登录表单 START */
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 【LOGIN-MAIN-1-B-3/4-N】通用输入组 */
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3/4-N-a】输入标签 */
+        .input-group label {
+            display: block;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3/4-N-b】输入框包装器 */
+        .input-wrapper {
+            position: relative;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3/4-N-b1】输入图标 */
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(201,169,110,0.6);
+            font-size: 16px;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3/4-N-b2】输入框本体 */
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-wrapper input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .input-wrapper input:focus {
+            border-color: #c9a96e;
+            background: rgba(201,169,110,0.05);
+            box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
+        }
+
+        /* 【LOGIN-MAIN-1-B-3/4-N-b3】密码可见切换 */
+        .input-wrapper .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3/4-N-c】错误提示 */
+        .error-msg {
+            color: #ff4d4f;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            padding-left: 4px;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3-1】用户名输入组 */
+        /* 【LOGIN-MAIN-1-B-3-2】密码输入组 */
+        /* 【LOGIN-MAIN-1-B-3-3】手机号输入组 */
+
+        /* 【LOGIN-MAIN-1-B-3-4】选项行 START */
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 25px 0;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3-4a】记住我 */
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #c9a96e;
+            cursor: pointer;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3-4b】忘记密码链接 */
+        .forgot-link {
+            color: #c9a96e;
+            font-size: 13px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            text-decoration: none;
+        }
+
+        .forgot-link:hover {
+            opacity: 0.8;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3-4】选项行 END */
+
+        /* 【LOGIN-MAIN-1-B-3-5】登录提交按钮 */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 32px rgba(201,169,110,0.3);
+            letter-spacing: 2px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(201,169,110,0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 【LOGIN-MAIN-1-B-3】登录表单 END */
+
+        /* 【LOGIN-MAIN-1-B-4】注册表单 START */
+        /* 【LOGIN-MAIN-1-B-4-1】用户名输入组 - 复用通用样式 */
+        /* 【LOGIN-MAIN-1-B-4-2】手机号输入组 - 复用通用样式 */
+        /* 【LOGIN-MAIN-1-B-4-3】密码输入组 - 复用通用样式 */
+        /* 【LOGIN-MAIN-1-B-4-4】确认密码输入组 - 复用通用样式 */
+
+        /* 【LOGIN-MAIN-1-B-4-5】注册提交按钮 - 复用.submit-btn */
+
+        /* 【LOGIN-MAIN-1-B-4-6】用户协议 */
+        .agreement {
+            margin-top: 16px;
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .agreement a {
+            color: #c9a96e;
+            text-decoration: none;
+        }
+
+        .agreement a:hover {
+            text-decoration: underline;
+        }
+
+        /* 【LOGIN-MAIN-1-B-4】注册表单 END */
+
+        /* 【LOGIN-MAIN-1-B】右侧表单区 END */
+
+        /* 【LOGIN-MAIN-1】登录主容器 END */
+
+        /* ============================================================
+           【LOGIN-FOOTER-1】底部安全提示
+           位置：页面底部中央
+           功能：安全认证标识
+           ============================================================ */
+        .security-footer {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255,255,255,0.2);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1;
+        }
+
+        /* 【LOGIN-FOOTER-1-N】单个安全标识 */
+        .security-footer span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ============================================================
+           【LOGIN-TOAST-1】消息提示弹窗
+           位置：页面顶部中央
+           功能：操作成功/失败提示
+           ============================================================ */
+        .toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.4s ease;
+            white-space: nowrap;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff;
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+            color: #fff;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ============================================================
+           【LOGIN-LOADING-1】加载遮罩层
+           位置：页面顶层
+           功能：API请求时显示加载状态
+           ============================================================ */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10,10,26,0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(201,169,110,0.2);
+            border-top-color: #c9a96e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==========================================================
+         【LOGIN-BG-1】登录页全局背景层 START
+         位置：整个页面最底层
+         ========================================================== -->
+
+    <!-- ==========================================================
+         【LOGIN-MAIN-1】登录主容器 START
+         位置：页面中央
+         ========================================================== -->
+    <div class="login-container">
+
+        <!-- ==========================================================
+             【LOGIN-MAIN-1-A】左侧品牌区 START
+             位置：主容器左侧
+             宽度：420px
+             ========================================================== -->
+        <div class="brand-section">
+
+            <!-- 【LOGIN-MAIN-1-A-1】品牌顶部区域 START -->
+            <div class="brand-top">
+
+                <!-- 【LOGIN-MAIN-1-A-1-1】Logo区域 START -->
+                <div class="brand-logo">
+                    <!-- 【LOGIN-MAIN-1-A-1-1a】Logo图标 -->
+                    <div class="brand-logo-icon">💰</div>
+                    <!-- 【LOGIN-MAIN-1-A-1-1b】Logo文字 -->
+                    <div class="brand-logo-text">
+                        <h2>GoldSim</h2>
+                        <p>PRECIOUS METAL</p>
+                    </div>
+                </div>
+                <!-- 【LOGIN-MAIN-1-A-1-1】Logo区域 END -->
+
+                <!-- 【LOGIN-MAIN-1-A-1-2】品牌标题 -->
+                <h1 class="brand-title">
+                    安全稳健<br>
+                    <span>贵金属模拟交易</span>首选平台
+                </h1>
+
+                <!-- 【LOGIN-MAIN-1-A-1-3】品牌描述 -->
+                <p class="brand-desc">
+                    专业提供黄金、白银、铂金等<br>
+                    贵金属模拟交易服务，实时行情、虚拟资金、盈亏排行
+                </p>
+            </div>
+            <!-- 【LOGIN-MAIN-1-A-1】品牌顶部区域 END -->
+
+            <!-- 【LOGIN-MAIN-1-A-2】特色功能区域 START -->
+            <div class="brand-features">
+                <!-- 【LOGIN-MAIN-1-A-2-1】模拟交易 -->
+                <div class="feature-item">
+                    <div class="icon">📈</div>
+                    <span>虚拟资金模拟真实交易</span>
+                </div>
+                <!-- 【LOGIN-MAIN-1-A-2-2】实时行情 -->
+                <div class="feature-item">
+                    <div class="icon">⚡</div>
+                    <span>毫秒级行情实时推送</span>
+                </div>
+                <!-- 【LOGIN-MAIN-1-A-2-3】门店支持 -->
+                <div class="feature-item">
+                    <div class="icon">🏪</div>
+                    <span>全国线下门店实物交割</span>
+                </div>
+            </div>
+            <!-- 【LOGIN-MAIN-1-A-2】特色功能区域 END -->
+
+        </div>
+        <!-- 【LOGIN-MAIN-1-A】左侧品牌区 END -->
+
+        <!-- ==========================================================
+             【LOGIN-MAIN-1-B】右侧表单区 START
+             位置：主容器右侧
+             ========================================================== -->
+        <div class="form-section">
+
+            <!-- 【LOGIN-MAIN-1-B-1】表单头部 START -->
+            <div class="form-header">
+                <!-- 【LOGIN-MAIN-1-B-1a】表单标题 -->
+                <h3 id="formTitle">欢迎回来</h3>
+                <!-- 【LOGIN-MAIN-1-B-1b】表单副标题 -->
+                <p id="formSubtitle">请登录您的账户以继续交易</p>
+            </div>
+            <!-- 【LOGIN-MAIN-1-B-1】表单头部 END -->
+
+            <!-- 【LOGIN-MAIN-1-B-2】登录/注册切换标签 START -->
+            <div class="form-tabs">
+                <!-- 【LOGIN-MAIN-1-B-2-1】登录标签 -->
+                <button class="form-tab active" onclick="switchTab('login')">登录</button>
+                <!-- 【LOGIN-MAIN-1-B-2-2】注册标签 -->
+                <button class="form-tab" onclick="switchTab('register')">注册</button>
+            </div>
+            <!-- 【LOGIN-MAIN-1-B-2】切换标签 END -->
+
+            <!-- ==========================================================
+                 【LOGIN-MAIN-1-B-3】登录表单 START
+                 接口: POST /api/user/login
+                 字段: username, password, phone
+                 ========================================================== -->
+            <div class="form-content active" id="loginForm">
+
+                <!-- 【LOGIN-MAIN-1-B-3-1】用户名输入组 START -->
+                <div class="input-group">
+                    <!-- 【LOGIN-MAIN-1-B-3-1-a】输入标签 -->
+                    <label>用户名</label>
+                    <!-- 【LOGIN-MAIN-1-B-3-1-b】输入框包装器 START -->
+                    <div class="input-wrapper">
+                        <!-- 【LOGIN-MAIN-1-B-3-1-b1】输入图标 -->
+                        <span class="input-icon">👤</span>
+                        <!-- 【LOGIN-MAIN-1-B-3-1-b2】输入框本体 -->
+                        <input type="text" placeholder="3-50位用户名" maxlength="50" id="loginUsername">
+                    </div>
+                    <!-- 【LOGIN-MAIN-1-B-3-1-b】输入框包装器 END -->
+                    <!-- 【LOGIN-MAIN-1-B-3-1-c】错误提示 -->
+                    <div class="error-msg" id="loginUsernameError">用户名长度需在3-50位之间</div>
+                </div>
+                <!-- 【LOGIN-MAIN-1-B-3-1】用户名输入组 END -->
+
+                <!-- 【LOGIN-MAIN-1-B-3-2】密码输入组 START -->
+                <div class="input-group">
+                    <label>登录密码</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" placeholder="6-32位密码" id="loginPassword">
+                        <!-- 【LOGIN-MAIN-1-B-3-2-b3】密码可见切换 -->
+                        <span class="toggle-password" onclick="togglePassword('loginPassword')">👁️</span>
+                    </div>
+                    <div class="error-msg" id="loginPasswordError">密码长度需在6-32位之间</div>
+                </div>
+                <!-- 【LOGIN-MAIN-1-B-3-2】密码输入组 END -->
+
+                <!-- 【LOGIN-MAIN-1-B-3-3】手机号输入组 START -->
+                <div class="input-group">
+                    <label>手机号码</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📱</span>
+                        <input type="tel" placeholder="请输入11位手机号" maxlength="11" id="loginPhone">
+                    </div>
+                    <div class="error-msg" id="loginPhoneError">请输入正确的11位手机号</div>
+                </div>
+                <!-- 【LOGIN-MAIN-1-B-3-3】手机号输入组 END -->
+
+                <!-- 【LOGIN-MAIN-1-B-3-4】选项行 START -->
+                <div class="options-row">
+                    <!-- 【LOGIN-MAIN-1-B-3-4a】记住我 -->
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe" checked>
+                        <span>记住我</span>
+                    </label>
+                    <!-- 【LOGIN-MAIN-1-B-3-4b】忘记密码 -->
+                    <a class="forgot-link" href="#">忘记密码？</a>
+                </div>
+                <!-- 【LOGIN-MAIN-1-B-3-4】选项行 END -->
+
+                <!-- 【LOGIN-MAIN-1-B-3-5】登录提交按钮 -->
+                <button class="submit-btn" onclick="handleLogin()" id="loginBtn">登 录</button>
+
+            </div>
+            <!-- 【LOGIN-MAIN-1-B-3】登录表单 END -->
+
+            <!-- ==========================================================
+                 【LOGIN-MAIN-1-B-4】注册表单 START
+                 接口: POST /api/user/register
+                 字段: username, password, phone
+                 ========================================================== -->
+            <div class="form-content" id="registerForm">
+
+                <!-- 【LOGIN-MAIN-1-B-4-1】用户名输入组 START -->
+                <div class="input-group">
+                    <label>用户名</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" placeholder="3-50位用户名，用于登录" maxlength="50" id="regUsername">
+                    </div>
+                    <div class="error-msg" id="regUsernameError">用户名长度需在3-50位之间</div>
+                </div>
+                <!-- 【LOGIN-MAIN-1-B-4-1】用户名输入组 END -->
+
+                <!-- 【LOGIN-MAIN-1-B-4-2】手机号输入组 START -->
+                <div class="input-group">
+                    <label>手机号码</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📱</span>
+                        <input type="tel" placeholder="请输入11位手机号" maxlength="11" id="regPhone">
+                    </div>
+                    <div class="error-msg" id="regPhoneError">请输入正确的11位手机号</div>
+                </div>
+                <!-- 【LOGIN-MAIN-1-B-4-2】手机号输入组 END -->
+
+                <!-- 【LOGIN-MAIN-1-B-4-3】密码输入组 START -->
+                <div class="input-group">
+                    <label>设置密码</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" placeholder="6-32位密码" id="regPassword">
+                        <span class="toggle-password" onclick="togglePassword('regPassword')">👁️</span>
+                    </div>
+                    <div class="error-msg" id="regPasswordError">密码长度需在6-32位之间</div>
+                </div>
+                <!-- 【LOGIN-MAIN-1-B-4-3】密码输入组 END -->
+
+                <!-- 【LOGIN-MAIN-1-B-4-4】确认密码输入组 START -->
+                <div class="input-group">
+                    <label>确认密码</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔐</span>
+                        <input type="password" placeholder="请再次输入密码" id="regConfirmPassword">
+                        <span class="toggle-password" onclick="togglePassword('regConfirmPassword')">👁️</span>
+                    </div>
+                    <div class="error-msg" id="regConfirmError">两次输入的密码不一致</div>
+                </div>
+                <!-- 【LOGIN-MAIN-1-B-4-4】确认密码输入组 END -->
+
+                <!-- 【LOGIN-MAIN-1-B-4-5】注册提交按钮 -->
+                <button class="submit-btn" onclick="handleRegister()" id="registerBtn">注 册</button>
+
+                <!-- 【LOGIN-MAIN-1-B-4-6】用户协议 -->
+                <p class="agreement">
+                    注册即表示您同意 <a href="#">《用户服务协议》</a> 和 <a href="#">《隐私政策》</a>
+                </p>
+
+            </div>
+            <!-- 【LOGIN-MAIN-1-B-4】注册表单 END -->
+
+        </div>
+        <!-- 【LOGIN-MAIN-1-B】右侧表单区 END -->
+
+    </div>
+    <!-- 【LOGIN-MAIN-1】登录主容器 END -->
+
+    <!-- ==========================================================
+         【LOGIN-FOOTER-1】底部安全提示 START
+         位置：页面底部中央
+         ========================================================== -->
+    <div class="security-footer">
+        <!-- 【LOGIN-FOOTER-1-1】SSL加密 -->
+        <span>🔒 SSL加密传输</span>
+        <!-- 【LOGIN-FOOTER-1-2】资金存管 -->
+        <span>🛡️ 资金银行存管</span>
+        <!-- 【LOGIN-FOOTER-1-3】实名认证 -->
+        <span>✓ 实名认证保障</span>
+    </div>
+    <!-- 【LOGIN-FOOTER-1】底部安全提示 END -->
+
+    <!-- ==========================================================
+         【LOGIN-TOAST-1】消息提示弹窗 START
+         位置：页面顶部中央
+         ========================================================== -->
+    <div class="toast" id="toast"></div>
+    <!-- 【LOGIN-TOAST-1】消息提示弹窗 END -->
+
+    <!-- ==========================================================
+         【LOGIN-LOADING-1】加载遮罩层 START
+         位置：页面顶层
+         ========================================================== -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    <!-- 【LOGIN-LOADING-1】加载遮罩层 END -->
+
+    <script>
+        // ==================== 全局配置 ====================
+        const API_BASE = 'http://localhost:8080';   // 网关地址
+        const API_LOGIN = '/api/user/login';        // 登录接口
+        const API_REGISTER = '/api/user/register';  // 注册接口
+
+        // ==================== 工具函数 ====================
+
+        /**
+         * 【LOGIN-JS-1】显示消息提示
+         * @param {string} msg - 提示内容
+         * @param {string} type - 类型: 'success' | 'error'
+         */
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast ' + type;
+            // 强制重绘以触发过渡
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        /**
+         * 【LOGIN-JS-2】显示/隐藏加载状态
+         * @param {boolean} show - 是否显示
+         */
+        function toggleLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('show', show);
+        }
+
+        /**
+         * 【LOGIN-JS-3】切换登录/注册标签
+         * @param {string} type - 'login' | 'register'
+         */
+        function switchTab(type) {
+            const tabs = document.querySelectorAll('.form-tab');
+            const forms = document.querySelectorAll('.form-content');
+            const title = document.getElementById('formTitle');
+            const subtitle = document.getElementById('formSubtitle');
+
+            tabs.forEach((tab, index) => {
+                tab.classList.toggle('active',
+                    (type === 'login' && index === 0) || (type === 'register' && index === 1));
+            });
+
+            forms.forEach((form, index) => {
+                form.classList.toggle('active',
+                    (type === 'login' && index === 0) || (type === 'register' && index === 1));
+            });
+
+            if (type === 'login') {
+                title.textContent = '欢迎回来';
+                subtitle.textContent = '请登录您的账户以继续交易';
+            } else {
+                title.textContent = '创建账户';
+                subtitle.textContent = '注册后即可开始贵金属模拟交易';
+            }
+
+            // 切换时清除错误提示
+            document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
+        }
+
+        /**
+         * 【LOGIN-JS-4】显示/隐藏密码
+         * @param {string} inputId - 输入框ID
+         */
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        /**
+         * 【LOGIN-JS-5】通用请求封装
+         * @param {string} url - 接口路径
+         * @param {object} body - 请求体
+         * @returns {Promise<object>} - 响应结果
+         */
+        async function apiPost(url, body) {
+            const response = await fetch(API_BASE + url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+            // 注册接口返回 void (HTTP 200)
+            if (response.status === 200 && response.headers.get('content-length') === '0') {
+                return { code: 'A00000', msg: 'success', data: null };
+            }
+            return await response.json();
+        }
+
+        // ==================== 表单验证规则 ====================
+        const validators = {
+            username: (v) => v && v.length >= 3 && v.length <= 50,
+            password: (v) => v && v.length >= 6 && v.length <= 32,
+            phone: (v) => /^1[3-9]\d{9}$/.test(v)
+        };
+
+        // ==================== 登录处理 ====================
+
+        /**
+         * 【LOGIN-JS-6】登录表单提交
+         * 接口: POST /api/user/login
+         * 存储: token → localStorage
+         */
+        async function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const phone = document.getElementById('loginPhone').value.trim();
+            let hasError = false;
+
+            // 验证用户名
+            if (!validators.username(username)) {
+                document.getElementById('loginUsernameError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('loginUsernameError').classList.remove('show');
+            }
+
+            // 验证密码
+            if (!validators.password(password)) {
+                document.getElementById('loginPasswordError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('loginPasswordError').classList.remove('show');
+            }
+
+            // 验证手机号
+            if (!validators.phone(phone)) {
+                document.getElementById('loginPhoneError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('loginPhoneError').classList.remove('show');
+            }
+
+            if (hasError) return;
+
+            toggleLoading(true);
+            try {
+                const result = await apiPost(API_LOGIN, { username, password, phone });
+
+                if (result.code === 'A00000' && result.data) {
+                    // 【LOGIN-JS-6-1】存储Token
+                    const token = result.data.token;
+                    localStorage.setItem('goldsim_token', token);
+                    localStorage.setItem('goldsim_user', JSON.stringify({
+                        id: result.data.id,
+                        username: result.data.username,
+                        phone: result.data.phone,
+                        avatar: result.data.avatar,
+                        realBalance: result.data.realBalance,
+                        realNameVerified: result.data.realNameVerified
+                    }));
+
+                    // 记住我
+                    if (document.getElementById('rememberMe').checked) {
+                        localStorage.setItem('goldsim_remember', '1');
+                    } else {
+                        localStorage.removeItem('goldsim_remember');
+                    }
+
+                    showToast('登录成功！正在跳转...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/index.html'; // 跳转首页
+                    }, 1200);
+                } else {
+                    showToast(result.msg || '登录失败，请检查账号密码', 'error');
+                }
+            } catch (err) {
+                showToast('网络异常，请稍后重试', 'error');
+                console.error('[Login Error]', err);
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        // ==================== 注册处理 ====================
+
+        /**
+         * 【LOGIN-JS-7】注册表单提交
+         * 接口: POST /api/user/register
+         * 说明: 注册成功后自动登录（后端建立Sa-Token会话），前端跳转到登录页
+         */
+        async function handleRegister() {
+            const username = document.getElementById('regUsername').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirmPassword').value;
+            let hasError = false;
+
+            // 验证用户名
+            if (!validators.username(username)) {
+                document.getElementById('regUsernameError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('regUsernameError').classList.remove('show');
+            }
+
+            // 验证手机号
+            if (!validators.phone(phone)) {
+                document.getElementById('regPhoneError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('regPhoneError').classList.remove('show');
+            }
+
+            // 验证密码
+            if (!validators.password(password)) {
+                document.getElementById('regPasswordError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('regPasswordError').classList.remove('show');
+            }
+
+            // 验证确认密码
+            if (password !== confirm) {
+                document.getElementById('regConfirmError').classList.add('show');
+                hasError = true;
+            } else {
+                document.getElementById('regConfirmError').classList.remove('show');
+            }
+
+            if (hasError) return;
+
+            toggleLoading(true);
+            try {
+                const result = await apiPost(API_REGISTER, { username, password, phone });
+
+                if (result.code === 'A00000') {
+                    showToast('注册成功！请登录', 'success');
+                    // 清空注册表单
+                    document.getElementById('regUsername').value = '';
+                    document.getElementById('regPhone').value = '';
+                    document.getElementById('regPassword').value = '';
+                    document.getElementById('regConfirmPassword').value = '';
+                    // 切换到登录页
+                    setTimeout(() => switchTab('login'), 1500);
+                } else if (result.code === 'A01001') {
+                    showToast('用户名已存在，请更换', 'error');
+                } else {
+                    showToast(result.msg || '注册失败，请稍后重试', 'error');
+                }
+            } catch (err) {
+                showToast('网络异常，请稍后重试', 'error');
+                console.error('[Register Error]', err);
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        // ==================== 页面初始化 ====================
+
+        /**
+         * 【LOGIN-JS-8】页面初始化
+         * 功能: 检查是否已登录，若已登录则自动跳转
+         */
+        (function init() {
+            const token = localStorage.getItem('goldsim_token');
+            if (token) {
+                // 可选：发送请求验证token有效性
+                // 这里简单处理：有token就跳转
+                // window.location.href = '/index.html';
+            }
+
+            // 回车键提交
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const loginForm = document.getElementById('loginForm');
+                    if (loginForm.classList.contains('active')) {
+                        handleLogin();
+                    } else {
+                        handleRegister();
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

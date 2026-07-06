@@ -1,0 +1,8 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.gold.common.config.AutoWebConfig,\
+  com.gold.common.config.JsonConfig,\
+  com.gold.common.config.RabbitMQConfig,\
+  com.gold.common.config.MybatisPlusConfig,\
+  com.gold.common.config.CommonAutoConfiguration,\
+  com.gold.common.utils.RedisCacheUtil
+# TODO [自动配置错误] RedisCacheUtil 是 @Component 而非 @Configuration/@AutoConfiguration 类，不应放在 spring.factories 中。会被 Spring 尝试当作配置类加载，可能导致启动警告/异常。应移除这一行，让 @ComponentScan 正常发现它

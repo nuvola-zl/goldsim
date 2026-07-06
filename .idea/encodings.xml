@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/gold-admin-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-admin-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-file-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-flash-sale-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-flash-sale-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-mall-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-mall-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-mall-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-market-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-market-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-news-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-news-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-order-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-product-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-simulation-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-simulation-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-store-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-store-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-user-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gold-user-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

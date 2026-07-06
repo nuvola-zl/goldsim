@@ -1,0 +1,2476 @@
+
+# 继续生成HTML文件的后半部分（JavaScript逻辑）
+js_part2 = '''            return data;
+        }
+
+        /**
+         * 查询资产总览
+         * 接口：[26] GET /api/simulation/account/overview
+         */
+        async function fetchAccountOverview() {
+            const data = await apiRequest('/simulation/account/overview');
+            if (data) {
+                simBalance = parseFloat(data.balance) || 100000;
+                totalProfit = parseFloat(data.totalProfit) || 0;
+                updateAssetDisplay(data);
+            }
+            return data;
+        }
+
+        /**
+         * 查询交易统计
+         * 接口：[28] GET /api/simulation/account/statistics
+         */
+        async function fetchStatistics() {
+            return await apiRequest('/simulation/account/statistics');
+        }
+
+        /**
+         * 查询排行榜Top20
+         * 接口：[16] GET /api/simulation/leaderboard/top20
+         */
+        async function fetchLeaderboard() {
+            return await apiRequest('/simulation/leaderboard/top20');
+        }
+
+        /**
+         * 查询我的排名
+         * 接口：[17] GET /api/simulation/leaderboard/my-rank
+         */
+        async function fetchMyRank() {
+            return await apiRequest('/simulation/leaderboard/my-rank');
+        }
+
+        /**
+         * 查询交易配置
+         * 接口：[29] GET /api/simulation/config
+         */
+        async function fetchConfig() {
+            const data = await apiRequest('/simulation/config');
+            if (data) {
+                configData = data;
+            }
+            return data;
+        }
+
+        // ================================================================
+        //  【UI-1】页面渲染函数
+        // ================================================================
+
+        /**
+         * 更新资产概览显示
+         * 接口：[26] AccountOverviewVO
+         */
+        function updateAssetDisplay(data) {
+            document.getElementById('simTotalAsset').textContent = '¥' + formatMoney(data.totalAsset);
+            document.getElementById('simAvailBalance').textContent = '¥' + formatMoney(data.balance);
+            document.getElementById('simHoldValue').textContent = '¥' + formatMoney(data.positionMarketValue);
+            const profitEl = document.getElementById('simTotalProfit');
+            const profit = parseFloat(data.totalProfit) || 0;
+            profitEl.textContent = (profit >= 0 ? '+' : '') + '¥' + formatMoney(profit);
+            profitEl.className = 'value ' + (profit >= 0 ? 'up' : 'down');
+            const todayEl = document.getElementById('simTodayProfit');
+            const today = parseFloat(data.todayProfit) || 0;
+            todayEl.textContent = (today >= 0 ? '+' : '') + '¥' + formatMoney(today);
+            todayEl.className = 'value ' + (today >= 0 ? 'up' : 'down');
+            document.getElementById('simBalance').textContent = '¥' + formatMoney(data.balance);
+        }
+
+        /**
+         * 渲染持仓分布
+         * 接口：[19] position/list
+         */
+        function renderHoldDist(positions) {
+            const container = document.getElementById('holdDist');
+            if (!positions || positions.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无持仓</div>';
+                return;
+            }
+            const totalMV = positions.reduce((sum, p) => sum + (parseFloat(p.marketValue) || 0), 0);
+            const colors = { AU: '#c9a96e', AG: '#a0a0a0', PT: '#cd7f32' };
+            container.innerHTML = positions.map(pos => {
+                const mv = parseFloat(pos.marketValue) || 0;
+                const pct = totalMV > 0 ? ((mv / totalMV) * 100).toFixed(1) : 0;
+                const color = colors[pos.metalType] || '#999';
+                return `
+                    <div class="dist-item">
+                        <span class="dist-dot" style="background:${color}"></span>
+                        <span>${pos.metalName || pos.metalType}</span>
+                        <b>¥${formatMoney(mv)}</b>
+                        <em>${pct}%</em>
+                    </div>
+                    <div class="dist-bar"><div style="width:${pct}%;background:${color}"></div></div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * 渲染交易统计
+         * 接口：[28] TradeStatisticsVO
+         */
+        function renderStatistics(data) {
+            if (!data) return;
+            document.getElementById('statTotalCount').textContent = data.totalTradeCount || 0;
+            document.getElementById('statWinRate').textContent = data.winRate || '0%';
+            document.getElementById('statBuyValue').textContent = '¥' + formatMoney(data.totalBuyValue);
+            document.getElementById('statSellValue').textContent = '¥' + formatMoney(data.totalSellValue);
+        }
+
+        /**
+         * 渲染排行榜迷你版
+         * 接口：[16] LeaderboardVO + [17] UserRankVO
+         */
+        function renderLeaderMini(list, myRank) {
+            const container = document.getElementById('leaderMini');
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无数据</div>';
+                return;
+            }
+            let html = '';
+            list.slice(0, 3).forEach((item, index) => {
+                const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze';
+                html += `
+                    <div class="rank-mini ${rankClass}">
+                        <span class="rank-num">${item.rank || (index + 1)}</span>
+                        <span class="nickname">${item.nickname || '用户***'}</span>
+                        <span class="profit">+¥${formatMoney(item.totalProfit)}</span>
+                    </div>
+                `;
+            });
+            // 我的排名
+            if (myRank) {
+                const myRankNum = myRank.onList ? (myRank.rank || '--') : '未上榜';
+                html += `
+                    <div class="rank-mini" style="border-top:1px solid #f0f0f0;margin-top:4px;padding-top:10px;">
+                        <span class="rank-num">${myRank.onList ? myRank.rank : '--'}</span>
+                        <span class="nickname">我 (${myRankNum})</span>
+                        <span class="profit">${myRank.totalProfit >= 0 ? '+' : ''}¥${formatMoney(myRank.totalProfit)}</span>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        /**
+         * 渲染最近交易记录
+         * 接口：[23] TradeRecordVO
+         */
+        function renderTradeRecords(records) {
+            const container = document.getElementById('tradeRecordList');
+            if (!records || records.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无交易记录</div>';
+                return;
+            }
+            container.innerHTML = records.map(record => {
+                const isBuy = record.tradeType === 'BUY';
+                const typeClass = isBuy ? 'buy' : 'sell';
+                const typeName = isBuy ? '买入' : '卖出';
+                const amount = parseFloat(record.amount) || 0;
+                const price = parseFloat(record.price) || 0;
+                const fee = parseFloat(record.fee) || 0;
+                const total = isBuy
+                    ? -(amount * price + fee)
+                    : (amount * price - fee);
+                const timeStr = formatTime(record.createTime);
+                return `
+                    <div class="trade-record-item">
+                        <span class="trade-type-tag ${typeClass}">${typeName}</span>
+                        <div class="trade-record-info">
+                            <div class="metal-name">${record.metalName || record.metalType} ${record.metalType}</div>
+                            <div class="trade-detail">${amount.toFixed(4)} 克 × ¥${price.toFixed(2)}</div>
+                        </div>
+                        <div class="trade-record-amount">
+                            <div class="value">${total >= 0 ? '+' : ''}¥${formatMoney(Math.abs(total))}</div>
+                            <div class="time">${timeStr}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * 更新左侧品种持仓显示
+         */
+        function updateSymbolHold(metal) {
+            const pos = positionCache[metal];
+            const holdEl = document.getElementById('symHold' + metal);
+            if (!pos || pos.amount <= 0) {
+                holdEl.innerHTML = '持仓: <span class="hold-amount">0.0000克</span> <em class="hold-profit">--</em>';
+                return;
+            }
+            const profit = pos.floatingProfit || 0;
+            const profitClass = profit > 0 ? 'up' : profit < 0 ? 'down' : '';
+            const profitStr = profit > 0 ? '+' + formatMoney(profit) : formatMoney(profit);
+            holdEl.innerHTML = `持仓: <span class="hold-amount">${pos.amount.toFixed(4)}克</span> <em class="hold-profit ${profitClass}">${profitStr}</em>`;
+        }
+
+        /**
+         * 更新持仓明细面板
+         */
+        function updatePositionDetail(metal) {
+            const pos = positionCache[metal];
+            const data = metalData[metal];
+            document.getElementById('posDetailTitle').textContent = '📊 ' + data.name + ' ' + metal + '持仓明细';
+            if (!pos || pos.amount <= 0) {
+                document.getElementById('posAmount').textContent = '0.0000 克';
+                document.getElementById('posAvgCost').textContent = '--';
+                document.getElementById('posMarketValue').textContent = '¥0.00';
+                document.getElementById('posFloatingProfit').textContent = '--';
+                document.getElementById('posProfitRate').textContent = '--';
+                return;
+            }
+            const mv = pos.amount * data.price;
+            const profit = pos.floatingProfit || 0;
+            const rate = pos.avgCostPrice > 0 ? ((data.price - pos.avgCostPrice) / pos.avgCostPrice * 100) : 0;
+            document.getElementById('posAmount').textContent = pos.amount.toFixed(4) + ' 克';
+            document.getElementById('posAvgCost').textContent = '¥' + pos.avgCostPrice.toFixed(2) + '/克';
+            document.getElementById('posMarketValue').textContent = '¥' + formatMoney(mv);
+            const profitEl = document.getElementById('posFloatingProfit');
+            profitEl.textContent = (profit >= 0 ? '+' : '') + '¥' + formatMoney(profit);
+            profitEl.className = 'value ' + (profit >= 0 ? 'up' : 'down');
+            const rateEl = document.getElementById('posProfitRate');
+            rateEl.textContent = (rate >= 0 ? '+' : '') + rate.toFixed(2) + '%';
+            rateEl.className = 'value ' + (rate >= 0 ? 'up' : 'down');
+        }
+
+        // ================================================================
+        //  【UI-2】品种切换与行情更新
+        // ================================================================
+
+        async function switchMetal(metal) {
+            currentMetal = metal;
+            const data = metalData[metal];
+            currentPrice = data.price;
+
+            // 更新左侧激活状态
+            document.querySelectorAll('.symbol-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`[data-metal="${metal}"]`).classList.add('active');
+
+            // 更新行情头部
+            document.getElementById('marketName').textContent = data.name + ' ' + metal;
+            document.getElementById('openPrice').textContent = data.open.toFixed(2);
+            document.getElementById('highPrice').textContent = data.high.toFixed(2);
+            document.getElementById('lowPrice').textContent = data.low.toFixed(2);
+            document.getElementById('preClose').textContent = data.preClose.toFixed(2);
+
+            const bigPriceEl = document.getElementById('bigPrice');
+            const changeEl = document.getElementById('priceChange');
+            bigPriceEl.textContent = '¥' + data.price.toFixed(2);
+            if (data.change >= 0) {
+                bigPriceEl.className = 'big-price up';
+                changeEl.className = 'price-change up';
+                changeEl.innerHTML = '▲ +' + data.change.toFixed(2) + ' &nbsp;&nbsp; +' + data.changePct.toFixed(2) + '%';
+            } else {
+                bigPriceEl.className = 'big-price down';
+                changeEl.className = 'price-change down';
+                changeEl.innerHTML = '▼ ' + data.change.toFixed(2) + ' &nbsp;&nbsp; ' + data.changePct.toFixed(2) + '%';
+            }
+
+            // 更新交易面板
+            document.getElementById('tradeMetalName').textContent = data.name + ' ' + metal;
+            document.getElementById('tradeMetalPrice').textContent = '¥' + data.price.toFixed(2);
+            updateTradePanelLabels();
+
+            // 更新持仓显示
+            updateSymbolHold(metal);
+            updatePositionDetail(metal);
+
+            // 重新计算交易金额
+            calcTrade();
+
+            // 异步获取最新持仓
+            await fetchPosition(metal);
+            updateSymbolHold(metal);
+            updatePositionDetail(metal);
+            updateTradePanelLabels();
+        }
+
+        function updateTradePanelLabels() {
+            const data = metalData[currentMetal];
+            const label = document.getElementById('tradeMetalLabel');
+            const holdLabel = document.getElementById('tradeHoldLabel');
+            if (tradeType === 'buy') {
+                label.textContent = '可买入';
+                holdLabel.textContent = '持仓 ' + data.hold.toFixed(4) + '克';
+            } else {
+                label.textContent = '可卖出 ' + data.hold.toFixed(4) + '克';
+                holdLabel.textContent = '持仓 ' + data.hold.toFixed(4) + '克';
+            }
+        }
+
+        // ================================================================
+        //  【UI-3】交易面板逻辑
+        // ================================================================
+
+        function switchTradeType(type) {
+            tradeType = type;
+            document.getElementById('btnBuyTab').className = 'type-btn buy' + (type === 'buy' ? ' active' : '');
+            document.getElementById('btnSellTab').className = 'type-btn sell' + (type === 'sell' ? ' active' : '');
+            const btn = document.getElementById('btnTradeAction');
+            btn.className = 'trade-btn ' + type;
+            btn.textContent = type === 'buy' ? '确认买入' : '确认卖出';
+            updateTradePanelLabels();
+            calcTrade();
+        }
+
+        function adjustAmount(delta) {
+            const input = document.getElementById('tradeAmount');
+            let val = parseFloat(input.value) || 0;
+            val = Math.max(MIN_AMOUNT, val + delta);
+            input.value = val.toFixed(4);
+            calcTrade();
+        }
+
+        function setQuickAmount(val) {
+            const input = document.getElementById('tradeAmount');
+            if (val === 'all') {
+                if (tradeType === 'sell') {
+                    input.value = (metalData[currentMetal].hold || MIN_AMOUNT).toFixed(4);
+                } else {
+                    // 买入全部 = 余额能买多少
+                    const max = Math.floor(simBalance / currentPrice * 10000) / 10000;
+                    input.value = Math.max(MIN_AMOUNT, max).toFixed(4);
+                }
+            } else {
+                input.value = val.toFixed(4);
+            }
+            // 更新快捷按钮激活状态
+            document.querySelectorAll('.quick-amount span').forEach(s => s.classList.remove('active'));
+            event.target.classList.add('active');
+            calcTrade();
+        }
+
+        function calcTrade() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+            const price = currentPrice;
+            const tradeValue = amount * price;
+            const fee = tradeValue * FEE_RATE;
+            const total = tradeType === 'buy' ? tradeValue + fee : tradeValue - fee;
+
+            document.getElementById('calcTradeValue').textContent = '¥' + tradeValue.toFixed(2);
+            document.getElementById('calcFee').textContent = '¥' + fee.toFixed(2);
+            document.getElementById('calcTotal').textContent = '¥' + total.toFixed(2);
+        }
+
+        // ================================================================
+        //  【UI-4】交易弹窗
+        // ================================================================
+
+        function openTradeModal() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+            if (amount < MIN_AMOUNT) {
+                showToast('交易数量不能小于 ' + MIN_AMOUNT + ' 克', 'error');
+                return;
+            }
+            if (tradeType === 'sell') {
+                const hold = metalData[currentMetal].hold;
+                if (hold < amount) {
+                    showToast('持仓不足，无法卖出（当前持仓 ' + hold.toFixed(4) + ' 克）', 'error');
+                    return;
+                }
+            }
+            if (tradeType === 'buy') {
+                const total = parseFloat(document.getElementById('calcTotal').textContent.replace(/[¥,]/g, ''));
+                if (total > simBalance) {
+                    showToast('虚拟余额不足', 'error');
+                    return;
+                }
+            }
+
+            const data = metalData[currentMetal];
+            document.getElementById('modalTitle').textContent = tradeType === 'buy' ? '确认买入' : '确认卖出';
+            document.getElementById('modalMetal').textContent = data.name + ' ' + currentMetal;
+            document.getElementById('modalType').textContent = tradeType === 'buy' ? '买入' : '卖出';
+            document.getElementById('modalPrice').textContent = '¥' + data.price.toFixed(2) + ' / 克';
+            document.getElementById('modalAmount').textContent = amount.toFixed(4) + ' 克';
+            document.getElementById('modalTradeValue').textContent = document.getElementById('calcTradeValue').textContent;
+            document.getElementById('modalFee').textContent = document.getElementById('calcFee').textContent;
+            document.getElementById('modalTotal').textContent = document.getElementById('calcTotal').textContent;
+
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            confirmBtn.className = 'modal-btn confirm ' + tradeType;
+            confirmBtn.textContent = tradeType === 'buy' ? '确认买入' : '确认卖出';
+
+            document.getElementById('tradeModal').classList.add('active');
+        }
+
+        function closeTradeModal() {
+            document.getElementById('tradeModal').classList.remove('active');
+        }
+
+        /**
+         * 确认交易（调用真实API）
+         */
+        async function confirmTrade() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+
+            let result;
+            if (tradeType === 'buy') {
+                result = await apiBuy(currentMetal, amount);
+            } else {
+                result = await apiSell(currentMetal, amount);
+            }
+
+            if (result) {
+                showToast(tradeType === 'buy'
+                    ? '买入成功！扣除虚拟资金 ¥' + formatMoney(result.totalCost)
+                    : '卖出成功！到账虚拟资金 ¥' + formatMoney(result.netIncome), 'success');
+
+                // 刷新相关数据
+                await refreshAssets();
+                await fetchPosition(currentMetal);
+                updateSymbolHold(currentMetal);
+                updatePositionDetail(currentMetal);
+                updateTradePanelLabels();
+
+                const history = await fetchTradeHistory(1, 5);
+                if (history && history.list) {
+                    renderTradeRecords(history.list);
+                }
+            } else {
+                mockTradeExecute();
+            }
+
+            closeTradeModal();
+        }
+
+        /**
+         * Mock交易执行（API不可用时）
+         */
+        function mockTradeExecute() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+            const data = metalData[currentMetal];
+            const tradeValue = amount * data.price;
+            const fee = tradeValue * FEE_RATE;
+
+            if (tradeType === 'buy') {
+                simBalance -= (tradeValue + fee);
+                data.hold += amount;
+                if (data.avgCost === 0) {
+                    data.avgCost = data.price;
+                } else {
+                    data.avgCost = (data.avgCost * (data.hold - amount) + data.price * amount) / data.hold;
+                }
+                totalProfit -= fee;
+                showToast('买入成功！扣除虚拟资金 ¥' + (tradeValue + fee).toFixed(2), 'success');
+            } else {
+                simBalance += (tradeValue - fee);
+                data.hold -= amount;
+                const profit = tradeValue - (amount * data.avgCost);
+                totalProfit += profit - fee;
+                showToast('卖出成功！到账虚拟资金 ¥' + (tradeValue - fee).toFixed(2), 'success');
+            }
+
+            // 更新本地显示
+            document.getElementById('simBalance').textContent = '¥' + simBalance.toFixed(2);
+            document.getElementById('simTotalAsset').textContent = '¥' + (simBalance + data.hold * data.price).toFixed(2);
+            document.getElementById('simAvailBalance').textContent = '¥' + simBalance.toFixed(0);
+            document.getElementById('simHoldValue').textContent = '¥' + (data.hold * data.price).toFixed(0);
+            const profitEl = document.getElementById('simTotalProfit');
+            profitEl.textContent = (totalProfit >= 0 ? '+' : '') + '¥' + totalProfit.toFixed(0);
+            profitEl.className = 'value ' + (totalProfit >= 0 ? 'up' : 'down');
+            updateSymbolHold(currentMetal);
+            updatePositionDetail(currentMetal);
+            updateTradePanelLabels();
+        }
+
+        // ================================================================
+        //  【UI-5】资产刷新
+        // ================================================================
+
+        async function refreshAssets() {
+            await fetchAccountOverview();
+            await fetchPositionList();
+            // 更新所有品种持仓显示
+            ['AU', 'AG', 'PT'].forEach(m => updateSymbolHold(m));
+            updatePositionDetail(currentMetal);
+            // 更新持仓分布
+            const positions = await fetchPositionList();
+            if (positions) renderHoldDist(positions);
+            // 更新统计
+            const stats = await fetchStatistics();
+            if (stats) renderStatistics(stats);
+            showToast('资产已刷新', 'success');
+        }
+
+        // ================================================================
+        //  【UI-6】Toast 提示
+        // ================================================================
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ================================================================
+        //  【UTIL-1】工具函数
+        // ================================================================
+
+        function formatMoney(num) {
+            if (num === undefined || num === null) return '0.00';
+            return parseFloat(num).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '刚刚';
+            const date = new Date(timeStr);
+            const now = new Date();
+            const diff = (now - date) / 1000;
+            if (diff < 60) return '刚刚';
+            if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+            if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+            if (diff < 172800) return '昨天';
+            return (date.getMonth() + 1) + '月' + date.getDate() + '日';
+        }
+
+        // ================================================================
+        //  【INIT-1】页面初始化
+        // ================================================================
+
+        async function initPage() {
+            // 1. 加载交易配置
+            await fetchConfig();
+
+            // 2. 加载资产总览
+            const overview = await fetchAccountOverview();
+            if (!overview) {
+                // Mock模式默认值
+                document.getElementById('simTotalAsset').textContent = '¥100,000.00';
+                document.getElementById('simAvailBalance').textContent = '¥100,000';
+                document.getElementById('simHoldValue').textContent = '¥0';
+                document.getElementById('simTotalProfit').textContent = '+¥0';
+                document.getElementById('simTodayProfit').textContent = '+¥0';
+            }
+
+            // 3. 加载全部持仓（用于左侧显示和持仓分布）
+            const positions = await fetchPositionList();
+            if (positions) {
+                positions.forEach(pos => updateSymbolHold(pos.metalType));
+                renderHoldDist(positions);
+            }
+
+            // 4. 加载当前品种持仓明细
+            await fetchPosition(currentMetal);
+            updateSymbolHold(currentMetal);
+            updatePositionDetail(currentMetal);
+
+            // 5. 加载最近交易记录
+            const history = await fetchTradeHistory(1, 5);
+            if (history && history.list) {
+                renderTradeRecords(history.list);
+            }
+
+            // 6. 加载交易统计
+            const stats = await fetchStatistics();
+            if (stats) renderStatistics(stats);
+
+            // 7. 加载排行榜
+            const [leaderboard, myRank] = await Promise.all([
+                fetchLeaderboard(),
+                fetchMyRank()
+            ]);
+            if (leaderboard) renderLeaderMini(leaderboard, myRank);
+
+            // 8. 计算交易金额
+            calcTrade();
+
+            // 9. 定时刷新（每30秒）
+            setInterval(async () => {
+                await fetchLatestPrice(currentMetal);
+                await fetchAccountOverview();
+                await fetchPosition(currentMetal);
+                updateSymbolHold(currentMetal);
+                updatePositionDetail(currentMetal);
+                updateTradePanelLabels();
+            }, 30000);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>'''
+
+print(f"JS部分长度: {len(js_part2)}")
+
+# 读取之前生成的HTML前半部分
+with open('/mnt/agents/output/goldsim_simulation_trade.html', 'w', encoding='utf-8') as f:
+    pass  # 先创建文件
+
+# 重新生成完整文件
+html_full = html_content + js_part2
+
+# 保存完整文件
+with open('/mnt/agents/output/goldsim_simulation_trade.html', 'w', encoding='utf-8') as f:
+    f.write(html_full)
+
+print(f"文件已保存，总长度: {len(html_full)}")
+
+# 重新读取之前生成的HTML前半部分（第一个代码块）
+# 由于变量丢失了，我需要重新生成完整的HTML文件
+
+html_part1 = '''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoldSim 模拟交易 - 虚拟资金·真实行情</title>
+    <style>
+        /* ============================================================
+           【BG-1】页面全局背景层
+           位置：整个页面最底层
+           功能：页面整体背景色
+           ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5; color: #333; min-width: 1200px;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* ============================================================
+           【TOP-1】顶部跑马灯行情区域
+           位置：页面最顶部
+           功能：显示各品种实时价格滚动（AU/AG/PT）
+           子模块：TOP-1-A(容器), TOP-1-B(内容滚动), TOP-1-C(品种项)
+           接口对应：[10] GET /api/market/price/latest
+           ============================================================ */
+        .ticker-bar {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff; height: 40px; line-height: 40px;
+            overflow: hidden; position: relative;
+        }
+        /* 【TOP-1-A】跑马灯内容容器 */
+        .ticker-content {
+            display: flex; animation: ticker 30s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        /* 【TOP-1-C】单个品种行情项 */
+        .ticker-item {
+            display: inline-flex; align-items: center;
+            padding: 0 30px; font-size: 14px;
+        }
+        .ticker-item .name { color: #c9a96e; font-weight: 600; margin-right: 8px; }
+        .ticker-item .price { font-weight: 700; margin-right: 8px; }
+        .ticker-item .change-up { color: #ff4d4f; }
+        .ticker-item .change-down { color: #52c41a; }
+
+        /* ============================================================
+           【HEADER-1】头部导航区域
+           位置：跑马灯下方
+           功能：Logo、搜索、用户操作
+           子模块：HEADER-1-A(顶部栏), HEADER-1-B(导航菜单)
+           ============================================================ */
+        .header {
+            background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        /* 【HEADER-1-A】头部顶部栏 */
+        .header-top {
+            width: 1200px; margin: 0 auto; padding: 18px 0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        /* 【HEADER-1-A-1】Logo区域 */
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        /* 【HEADER-1-A-1a】Logo图标 */
+        .logo-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; font-size: 26px;
+        }
+        /* 【HEADER-1-A-1b】Logo文字 */
+        .logo-text h1 { font-size: 22px; color: #1a1a2e; font-weight: 700; letter-spacing: 1px; }
+        .logo-text p { font-size: 12px; color: #999; margin-top: 2px; }
+        /* 【HEADER-1-A-2】搜索区域 */
+        .search-area { flex: 1; max-width: 480px; margin: 0 40px; }
+        /* 【HEADER-1-A-2a】搜索框 */
+        .search-box { display: flex; border: 2px solid #c9a96e; border-radius: 8px; overflow: hidden; }
+        .search-box input { flex: 1; padding: 10px 14px; border: none; outline: none; font-size: 14px; }
+        .search-box button {
+            padding: 0 22px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; border: none; font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        /* 【HEADER-1-A-3】用户操作区域 */
+        .user-area { display: flex; align-items: center; gap: 20px; }
+        .user-area a { font-size: 14px; color: #666; transition: color 0.3s; }
+        .user-area a:hover { color: #c9a96e; }
+        /* 【HEADER-1-A-3a】登录按钮 */
+        .btn-login {
+            padding: 7px 20px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff !important; border-radius: 6px; font-weight: 600;
+        }
+
+        /* ============================================================
+           【HEADER-1-B】主导航菜单区域
+           位置：头部下方
+           功能：页面主导航（模拟交易为当前页）
+           子模块：HEADER-1-B-1(分类下拉), HEADER-1-B-2(菜单项)
+           ============================================================ */
+        .nav-bar { background: #1a1a2e; height: 48px; line-height: 48px; }
+        /* 【HEADER-1-B-0】导航内容容器 */
+        .nav-content { width: 1200px; margin: 0 auto; display: flex; align-items: center; }
+        /* 【HEADER-1-B-1】品种分类下拉 */
+        .nav-category {
+            width: 200px; background: #c9a96e; color: #fff;
+            text-align: center; font-size: 15px; font-weight: 600; cursor: pointer;
+        }
+        /* 【HEADER-1-B-2】导航菜单项列表 */
+        .nav-menu { display: flex; flex: 1; padding-left: 20px; }
+        /* 【HEADER-1-B-2-N】单个导航项 */
+        .nav-menu li {
+            padding: 0 26px; color: #fff; font-size: 14px;
+            cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .nav-menu li:hover { color: #c9a96e; }
+        .nav-menu li.active::after {
+            content: ''; position: absolute; bottom: 0; left: 20%;
+            width: 60%; height: 3px; background: #c9a96e;
+        }
+
+        /* ============================================================
+           【MAIN-0】主体内容外层容器
+           位置：导航下方
+           功能：包裹左中右三栏
+           ============================================================ */
+        .main-container {
+            width: 1200px; margin: 20px auto;
+            display: flex; gap: 16px;
+        }
+
+        /* ============================================================
+           【LEFT-1】左侧边栏区域
+           位置：主体左侧
+           功能：品种导航列表 + 持仓快捷显示 + 持仓明细
+           子模块：LEFT-1-A(标题栏), LEFT-1-B(品种列表), LEFT-1-C(持仓明细)
+           宽度：240px
+           接口对应：[10] GET /api/market/price/latest
+                     [20] GET /api/simulation/position/{metalType}
+           ============================================================ */
+        .sidebar-left {
+            width: 240px; display: flex; flex-direction: column; gap: 16px;
+        }
+        /* 【LEFT-1-X】左侧卡片通用样式 */
+        .left-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        /* 【LEFT-1-X-A】卡片标题栏 */
+        .left-card-header {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff; font-size: 15px; font-weight: 600;
+        }
+        .left-card-header-light {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+        }
+        /* 【LEFT-1-B】品种列表容器 */
+        .symbol-list { padding: 6px 0; }
+        /* 【LEFT-1-B-N】单个品种项 */
+        .symbol-item {
+            padding: 14px 16px; cursor: pointer;
+            transition: all 0.3s; border-left: 3px solid transparent;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .symbol-item:last-child { border-bottom: none; }
+        .symbol-item:hover, .symbol-item.active {
+            background: #fff8e6; border-left-color: #c9a96e;
+        }
+        /* 【LEFT-1-B-N-a】品种名称行 */
+        .sym-row { display: flex; justify-content: space-between; align-items: center; }
+        .sym-name { font-size: 15px; font-weight: 600; color: #333; }
+        .sym-name span { font-size: 12px; color: #999; font-weight: 400; margin-left: 4px; }
+        .sym-price { font-size: 18px; font-weight: 700; }
+        /* 【LEFT-1-B-N-b】品种涨跌幅 */
+        .sym-change { font-size: 13px; margin-top: 3px; }
+        /* 【LEFT-1-B-N-d】持仓快捷显示（新增） */
+        .sym-hold {
+            font-size: 12px; color: #999; margin-top: 4px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .sym-hold .hold-amount { color: #c9a96e; font-weight: 600; }
+        .sym-hold .hold-profit { font-style: normal; }
+
+        /* 【LEFT-1-C】当前品种持仓明细 */
+        .position-detail { padding: 12px 16px; }
+        .pos-row {
+            display: flex; justify-content: space-between;
+            padding: 9px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px;
+        }
+        .pos-row:last-child { border-bottom: none; }
+        .pos-row .label { color: #999; }
+        .pos-row .value { font-weight: 600; color: #333; }
+
+        /* ============================================================
+           【CENTER-1】中间主内容区域
+           位置：主体中间
+           功能：行情展示、快捷交易面板、最近交易记录
+           子模块：CENTER-1-A(行情头部), CENTER-1-B(交易面板),
+                   CENTER-1-C(最近交易记录)
+           宽度：自适应
+           ============================================================ */
+        .main-content { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+        /* ============================================================
+           【CENTER-1-A】行情头部卡片
+           位置：中间区域顶部
+           功能：显示当前品种大价格及今日概览
+           子模块：CENTER-1-A-1(品种信息), CENTER-1-A-2(价格显示),
+                   CENTER-1-A-3(今日行情概览)
+           接口对应：[10] GET /api/market/price/latest
+           ============================================================ */
+        .market-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 12px; padding: 24px 30px; color: #fff;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        /* 【CENTER-1-A-1】品种信息区 */
+        .market-info h2 { font-size: 26px; font-weight: 700; }
+        .market-info .subtitle { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 4px; }
+        /* 【CENTER-1-A-2】价格显示区 */
+        .market-price-area { text-align: right; }
+        /* 【CENTER-1-A-2a】大价格数字 */
+        .big-price { font-size: 46px; font-weight: 700; letter-spacing: -2px; }
+        /* 【CENTER-1-A-2b】涨跌幅信息 */
+        .price-change { font-size: 17px; margin-top: 6px; }
+        /* 【CENTER-1-A-3】今日行情概览 */
+        .market-overview {
+            display: flex; gap: 24px; margin-top: 14px;
+            padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .overview-item { text-align: center; }
+        .overview-item .label { display: block; font-size: 11px; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
+        .overview-item .value { font-size: 15px; font-weight: 600; }
+
+        /* ============================================================
+           【CENTER-1-B】快捷交易面板区域
+           位置：行情头部下方
+           功能：模拟买入/卖出操作（虚拟资金）
+           子模块：CENTER-1-B-1(买卖切换), CENTER-1-B-2(品种显示),
+                   CENTER-1-B-3(数量输入), CENTER-1-B-4(快捷数量),
+                   CENTER-1-B-5(金额预估), CENTER-1-B-6(交易按钮),
+                   CENTER-1-B-7(规则提示)
+           接口对应：[14] POST /api/simulation/trade/buy
+                    [15] POST /api/simulation/trade/sell
+                    [20] GET /api/simulation/position/{metalType}
+                    [21] GET /api/simulation/position/{metalType}/available
+           ============================================================ */
+        .trade-panel {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 20px 24px;
+        }
+        /* 【CENTER-1-B-A】面板标题 */
+        .trade-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 16px;
+        }
+        .trade-header h3 { font-size: 16px; font-weight: 600; }
+        .balance-tip { font-size: 13px; color: #999; }
+        .balance-tip strong { color: #c9a96e; }
+        /* 【CENTER-1-B-1】买卖类型切换 */
+        .trade-type {
+            display: flex; gap: 0; margin-bottom: 16px;
+            border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;
+        }
+        .type-btn {
+            flex: 1; padding: 10px 0; border: none; background: #f8f9fa;
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .type-btn.active.buy {
+            background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%); color: #fff;
+        }
+        .type-btn.active.sell {
+            background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); color: #fff;
+        }
+        /* 【CENTER-1-B-2】当前品种显示 */
+        .metal-display {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; background: #f8f9fa;
+            border-radius: 8px; margin-bottom: 16px;
+        }
+        .metal-display .metal-name { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+        .metal-display .metal-label { font-size: 12px; color: #999; margin-top: 2px; }
+        .metal-display .metal-price { font-size: 20px; font-weight: 700; }
+        /* 【CENTER-1-B-3】数量输入组 */
+        .input-group {
+            display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
+        }
+        .input-group label { font-size: 14px; color: #666; white-space: nowrap; width: 70px; }
+        .input-wrap {
+            display: flex; align-items: center;
+            border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; flex: 1;
+        }
+        .input-wrap button {
+            width: 40px; height: 44px; border: none; background: #f5f5f5;
+            font-size: 18px; cursor: pointer; transition: background 0.3s;
+        }
+        .input-wrap button:hover { background: #e8e8e8; }
+        .input-wrap input {
+            flex: 1; height: 44px; border: none;
+            text-align: center; font-size: 16px; font-weight: 600; outline: none;
+        }
+        .input-wrap .unit {
+            padding: 0 14px; color: #999; font-size: 14px;
+            background: #f8f9fa; height: 44px; line-height: 44px;
+        }
+        /* 【CENTER-1-B-4】快捷数量 */
+        .quick-amount {
+            display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .quick-amount span {
+            padding: 5px 12px; background: #f5f5f5; border-radius: 6px;
+            font-size: 13px; color: #666; cursor: pointer; transition: all 0.2s;
+        }
+        .quick-amount span:hover { background: #e8e8e8; }
+        .quick-amount span.active { background: #c9a96e; color: #fff; }
+        /* 【CENTER-1-B-5】金额预估显示 */
+        .calc-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;
+        }
+        .calc-item {
+            background: #f8f9fa; border-radius: 8px; padding: 12px; text-align: center;
+        }
+        .calc-item .label { font-size: 12px; color: #999; }
+        .calc-item .value { font-size: 18px; font-weight: 700; color: #333; margin-top: 4px; }
+        .calc-item .value.fee { color: #ff4d4f; }
+        .calc-item .value.total { color: #c9a96e; }
+        /* 【CENTER-1-B-6】交易按钮 */
+        .trade-btn {
+            width: 100%; padding: 14px 0; border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s; color: #fff;
+        }
+        .trade-btn.buy { background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%); }
+        .trade-btn.sell { background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); }
+        .trade-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .trade-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        /* 【CENTER-1-B-7】规则提示 */
+        .trade-rule {
+            margin-top: 12px; text-align: center; font-size: 12px; color: #bbb;
+        }
+
+        /* ============================================================
+           【CENTER-1-C】最近交易记录区域
+           位置：交易面板下方
+           功能：展示当前用户最近5条交易流水
+           子模块：CENTER-1-C-A(标题栏), CENTER-1-C-B(记录列表),
+                   CENTER-1-C-1-N(单条记录项)
+           接口对应：[23] GET /api/simulation/trade/history?page=1&size=5
+           ============================================================ */
+        .recent-trade-section {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 20px;
+        }
+        /* 【CENTER-1-C-A】标题栏 */
+        .recent-trade-header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 16px;
+        }
+        .recent-trade-header h3 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .recent-trade-header a { font-size: 13px; color: #c9a96e; }
+        /* 【CENTER-1-C-1-N】单条交易记录 */
+        .trade-record-item {
+            display: flex; align-items: center;
+            padding: 11px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px;
+        }
+        .trade-record-item:last-child { border-bottom: none; }
+        /* 【CENTER-1-C-1-N-a】交易类型标签 */
+        .trade-type-tag {
+            width: 38px; height: 22px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 600; margin-right: 12px; flex-shrink: 0;
+        }
+        .trade-type-tag.buy { background: #fff2f0; color: #cf1322; }
+        .trade-type-tag.sell { background: #f6ffed; color: #389e0d; }
+        /* 【CENTER-1-C-1-N-b】交易信息 */
+        .trade-record-info { flex: 1; }
+        .trade-record-info .metal-name { font-weight: 600; color: #333; }
+        .trade-record-info .trade-detail { font-size: 12px; color: #999; margin-top: 2px; }
+        /* 【CENTER-1-C-1-N-c】交易金额和时间 */
+        .trade-record-amount { text-align: right; }
+        .trade-record-amount .value { font-weight: 700; color: #333; }
+        .trade-record-amount .time { font-size: 12px; color: #999; margin-top: 2px; }
+
+        /* ============================================================
+           【RIGHT-1】右侧边栏区域
+           位置：主体右侧
+           功能：模拟资产概览、持仓分布、交易统计、排行榜入口
+           子模块：RIGHT-1-A(资产概览), RIGHT-1-B(持仓分布),
+                   RIGHT-1-C(交易统计), RIGHT-1-D(排行榜入口)
+           宽度：280px
+           ============================================================ */
+        .sidebar-right {
+            width: 280px; display: flex;
+            flex-direction: column; gap: 16px;
+        }
+        /* 【RIGHT-1-X】右侧信息卡片通用样式 */
+        .info-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        /* 【RIGHT-1-X-A】卡片标题栏 */
+        .info-card-header {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-size: 15px; font-weight: 600; color: #333;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .info-card-header a { font-size: 13px; color: #c9a96e; cursor: pointer; }
+        /* 【RIGHT-1-X-B】卡片内容区 */
+        .info-card-body { padding: 12px 16px; }
+
+        /* ============================================================
+           【RIGHT-1-A】模拟资产概览区域
+           位置：右侧上部
+           功能：用户虚拟资产信息
+           子模块：RIGHT-1-A-1(虚拟总资产), RIGHT-1-A-2(资产明细网格)
+           接口对应：[26] GET /api/simulation/account/overview
+           ============================================================ */
+        .asset-overview { padding: 16px; text-align: center; }
+        /* 【RIGHT-1-A-1】虚拟总资产标签 */
+        .asset-label { font-size: 13px; color: #999; }
+        /* 【RIGHT-1-A-1a】总资产数值 */
+        .asset-total { font-size: 28px; font-weight: 700; color: #1a1a2e; margin: 8px 0 14px; }
+        /* 【RIGHT-1-A-2】资产明细网格 */
+        .asset-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .asset-cell { background: #f8f9fa; border-radius: 8px; padding: 11px; }
+        .asset-cell .label { font-size: 12px; color: #999; }
+        .asset-cell .value { font-size: 15px; font-weight: 600; color: #333; margin-top: 4px; }
+
+        /* ============================================================
+           【RIGHT-1-B】持仓分布区域
+           位置：右侧中部
+           功能：各品种市值占比可视化
+           接口对应：[19] GET /api/simulation/position/list
+           ============================================================ */
+        .hold-dist { padding: 12px 16px; }
+        .dist-item {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 14px; padding: 6px 0;
+        }
+        .dist-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dist-item span { flex: 1; color: #666; }
+        .dist-item b { font-weight: 600; color: #333; }
+        .dist-item em { font-size: 12px; color: #999; font-style: normal; }
+        .dist-bar { height: 4px; background: #f0f0f0; border-radius: 2px; margin-bottom: 8px; overflow: hidden; }
+        .dist-bar div { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+        /* ============================================================
+           【RIGHT-1-C】交易统计区域
+           位置：右侧中下部
+           功能：胜率、交易次数、累计买卖金额
+           接口对应：[28] GET /api/simulation/account/statistics
+           ============================================================ */
+        .stat-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; padding: 12px 16px;
+        }
+        .stat-box { background: #f8f9fa; border-radius: 8px; padding: 14px; text-align: center; }
+        .stat-box .num { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+        .stat-box .label { font-size: 12px; color: #999; margin-top: 4px; }
+
+        /* ============================================================
+           【RIGHT-1-D】排行榜入口区域
+           位置：右侧下部
+           功能：Top3 展示 + 我的排名快捷入口
+           接口对应：[16] GET /api/simulation/leaderboard/top20
+                    [17] GET /api/simulation/leaderboard/my-rank
+           ============================================================ */
+        .leader-mini { padding: 8px 0; }
+        .rank-mini {
+            display: flex; align-items: center;
+            padding: 9px 16px; font-size: 14px; border-bottom: 1px solid #f5f5f5;
+        }
+        .rank-mini:last-child { border-bottom: none; }
+        .rank-mini .rank-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; margin-right: 10px;
+            background: #f0f0f0; color: #999; flex-shrink: 0;
+        }
+        .rank-mini.gold .rank-num { background: linear-gradient(135deg, #ffd700 0%, #ffb800 100%); color: #fff; }
+        .rank-mini.silver .rank-num { background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%); color: #fff; }
+        .rank-mini.bronze .rank-num { background: linear-gradient(135deg, #cd7f32 0%, #b87333 100%); color: #fff; }
+        .rank-mini .nickname { flex: 1; color: #333; }
+        .rank-mini .profit { font-weight: 700; color: #ff4d4f; }
+
+        /* ============================================================
+           【FOOTER-1】页脚区域
+           位置：页面最底部
+           ============================================================ */
+        .footer {
+            background: #1a1a2e; color: #fff;
+            padding: 24px 0; margin-top: 30px; text-align: center;
+        }
+        .footer-inner {
+            width: 1200px; margin: 0 auto;
+            font-size: 12px; color: rgba(255,255,255,0.4);
+        }
+
+        /* ============================================================
+           【MODAL-1】交易确认弹窗区域
+           位置：页面全局覆盖层
+           功能：模拟交易买入/卖出确认
+           接口对应：[14] POST /api/simulation/trade/buy
+                    [15] POST /api/simulation/trade/sell
+           ============================================================ */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-container {
+            background: #fff; border-radius: 16px; width: 480px; max-width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            padding: 20px 24px; border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 700; }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%; border: none;
+            background: #f5f5f5; cursor: pointer; font-size: 16px; color: #999;
+        }
+        .modal-close:hover { background: #e0e0e0; color: #333; }
+        .modal-body { padding: 24px; }
+        .modal-row {
+            display: flex; justify-content: space-between;
+            padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px;
+        }
+        .modal-row:last-child { border-bottom: none; }
+        .modal-row .label { color: #666; }
+        .modal-row .value { font-weight: 600; color: #333; }
+        .modal-row .value.highlight { color: #c9a96e; font-size: 16px; }
+        .modal-footer { padding: 16px 24px 24px; display: flex; gap: 12px; }
+        .modal-btn {
+            flex: 1; padding: 12px 0; border-radius: 8px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            border: none; transition: all 0.3s;
+        }
+        .modal-btn.cancel { background: #f5f5f5; color: #666; }
+        .modal-btn.cancel:hover { background: #e0e0e0; }
+        .modal-btn.confirm { color: #fff; }
+        .modal-btn.confirm.buy { background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%); }
+        .modal-btn.confirm.sell { background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); }
+        .modal-btn.confirm:hover { opacity: 0.9; }
+
+        /* ============================================================
+           【TOAST-1】消息提示区域
+           位置：页面右上角固定
+           功能：操作成功/失败提示
+           ============================================================ */
+        .toast {
+            position: fixed; top: 60px; right: 30px;
+            padding: 14px 24px; border-radius: 8px; color: #fff;
+            font-size: 14px; font-weight: 600; z-index: 3000;
+            transform: translateX(150%); transition: transform 0.4s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); }
+        .toast.error { background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%); }
+
+        /* ============================================================
+           【UTIL-1】颜色工具类
+           ============================================================ */
+        .up { color: #ff4d4f !important; }
+        .down { color: #52c41a !important; }
+
+        /* ============================================================
+           【RESPONSIVE-1】响应式提示区域
+           ============================================================ */
+        @media (max-width: 1200px) {
+            body::before {
+                content: '请使用 1200px 以上宽度浏览以获得最佳体验';
+                position: fixed; top: 0; left: 0; right: 0;
+                background: #c9a96e; color: #fff;
+                text-align: center; padding: 8px; z-index: 9999; font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==========================================================
+         【BG-1】页面全局背景层
+         ========================================================== -->
+
+    <!-- ==========================================================
+         【TOP-1】顶部跑马灯行情区域 START
+         接口：[10] GET /api/market/price/latest
+         ========================================================== -->
+    <div class="ticker-bar">
+        <div class="ticker-content" id="tickerContent">
+            <div class="ticker-item">
+                <span class="name">黄金 AU</span>
+                <span class="price" id="tickerAuPrice">723.15</span>
+                <span class="change-up" id="tickerAuChange">▲ +1.25 +0.25%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">白银 AG</span>
+                <span class="price" id="tickerAgPrice">6.85</span>
+                <span class="change-up" id="tickerAgChange">▲ +0.03 +0.46%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">铂金 PT</span>
+                <span class="price" id="tickerPtPrice">228.50</span>
+                <span class="change-down" id="tickerPtChange">▼ -1.20 -0.52%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">黄金 AU</span>
+                <span class="price">723.15</span>
+                <span class="change-up">▲ +1.25 +0.25%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">白银 AG</span>
+                <span class="price">6.85</span>
+                <span class="change-up">▲ +0.03 +0.46%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">铂金 PT</span>
+                <span class="price">228.50</span>
+                <span class="change-down">▼ -1.20 -0.52%</span>
+            </div>
+        </div>
+    </div>
+    <!-- 【TOP-1】顶部跑马灯行情区域 END -->
+
+    <!-- ==========================================================
+         【HEADER-1】头部导航区域 START
+         ========================================================== -->
+    <header class="header">
+        <!-- 【HEADER-1-A】头部顶部栏 START -->
+        <div class="header-top">
+            <!-- 【HEADER-1-A-1】Logo区域 START -->
+            <div class="logo-area">
+                <div class="logo-icon">🏆</div>
+                <div class="logo-text">
+                    <h1>GoldSim 模拟投资</h1>
+                    <p>虚拟资金 · 真实行情 · 零风险练手</p>
+                </div>
+            </div>
+            <!-- 【HEADER-1-A-1】Logo区域 END -->
+
+            <!-- 【HEADER-1-A-2】搜索区域 START -->
+            <div class="search-area">
+                <div class="search-box">
+                    <input type="text" placeholder="搜索品种、资讯...">
+                    <button>搜索</button>
+                </div>
+            </div>
+            <!-- 【HEADER-1-A-2】搜索区域 END -->
+
+            <!-- 【HEADER-1-A-3】用户操作区域 START -->
+            <div class="user-area">
+                <a href="#">帮助中心</a>
+                <a href="#" class="btn-login">登录 / 注册</a>
+            </div>
+            <!-- 【HEADER-1-A-3】用户操作区域 END -->
+        </div>
+        <!-- 【HEADER-1-A】头部顶部栏 END -->
+
+        <!-- 【HEADER-1-B】主导航菜单区域 START -->
+        <nav class="nav-bar">
+            <div class="nav-content">
+                <div class="nav-category">📋 品种分类</div>
+                <ul class="nav-menu">
+                    <li>行情中心</li>
+                    <li class="active">模拟交易</li>
+                    <li>排行榜</li>
+                    <li>实物商城</li>
+                    <li>门店服务</li>
+                    <li>资讯动态</li>
+                    <li>个人中心</li>
+                </ul>
+            </div>
+        </nav>
+        <!-- 【HEADER-1-B】主导航菜单区域 END -->
+    </header>
+    <!-- 【HEADER-1】头部导航区域 END -->
+
+    <!-- ==========================================================
+         【MAIN-0】主体内容外层容器 START
+         功能：包裹左中右三栏
+         ========================================================== -->
+    <div class="main-container">
+
+        <!-- ==========================================================
+             【LEFT-1】左侧边栏区域 START
+             功能：品种导航列表 + 持仓快捷显示 + 持仓明细
+             宽度：240px
+             接口：[10] GET /api/market/price/latest
+                   [20] GET /api/simulation/position/{metalType}
+             ========================================================== -->
+        <aside class="sidebar-left">
+            <!-- 【LEFT-1-A】品种列表卡片 START -->
+            <div class="left-card">
+                <div class="left-card-header">📈 模拟品种</div>
+                <!-- 【LEFT-1-B】品种列表容器 START -->
+                <div class="symbol-list" id="symbolList">
+                    <!-- 【LEFT-1-B-1】黄金品种项 -->
+                    <div class="symbol-item active" data-metal="AU" onclick="switchMetal(\'AU\')">
+                        <div class="sym-row">
+                            <span class="sym-name">黄金 <span>AU</span></span>
+                            <span class="sym-price up" id="symPriceAU">723.15</span>
+                        </div>
+                        <div class="sym-change up" id="symChangeAU">▲ +3.15 +0.44%</div>
+                        <!-- 【LEFT-1-B-1-d】持仓快捷显示 -->
+                        <div class="sym-hold" id="symHoldAU">
+                            持仓: <span class="hold-amount">--</span>
+                            <em class="hold-profit">--</em>
+                        </div>
+                    </div>
+                    <!-- 【LEFT-1-B-2】白银品种项 -->
+                    <div class="symbol-item" data-metal="AG" onclick="switchMetal(\'AG\')">
+                        <div class="sym-row">
+                            <span class="sym-name">白银 <span>AG</span></span>
+                            <span class="sym-price up" id="symPriceAG">6.85</span>
+                        </div>
+                        <div class="sym-change up" id="symChangeAG">▲ +0.03 +0.46%</div>
+                        <div class="sym-hold" id="symHoldAG">
+                            持仓: <span class="hold-amount">--</span>
+                            <em class="hold-profit">--</em>
+                        </div>
+                    </div>
+                    <!-- 【LEFT-1-B-3】铂金品种项 -->
+                    <div class="symbol-item" data-metal="PT" onclick="switchMetal(\'PT\')">
+                        <div class="sym-row">
+                            <span class="sym-name">铂金 <span>PT</span></span>
+                            <span class="sym-price down" id="symPricePT">228.50</span>
+                        </div>
+                        <div class="sym-change down" id="symChangePT">▼ -1.20 -0.52%</div>
+                        <div class="sym-hold" id="symHoldPT">
+                            持仓: <span class="hold-amount">--</span>
+                            <em class="hold-profit">--</em>
+                        </div>
+                    </div>
+                </div>
+                <!-- 【LEFT-1-B】品种列表容器 END -->
+            </div>
+            <!-- 【LEFT-1-A】品种列表卡片 END -->
+
+            <!-- 【LEFT-1-C】当前品种持仓明细卡片 START -->
+            <div class="left-card">
+                <div class="left-card-header left-card-header-light" id="posDetailTitle">📊 AU持仓明细</div>
+                <div class="position-detail" id="positionDetail">
+                    <div class="pos-row"><span class="label">持有数量</span><span class="value" id="posAmount">--</span></div>
+                    <div class="pos-row"><span class="label">加权成本</span><span class="value" id="posAvgCost">--</span></div>
+                    <div class="pos-row"><span class="label">当前市值</span><span class="value" id="posMarketValue">--</span></div>
+                    <div class="pos-row"><span class="label">浮动盈亏</span><span class="value" id="posFloatingProfit">--</span></div>
+                    <div class="pos-row"><span class="label">盈亏率</span><span class="value" id="posProfitRate">--</span></div>
+                </div>
+            </div>
+            <!-- 【LEFT-1-C】当前品种持仓明细卡片 END -->
+        </aside>
+        <!-- 【LEFT-1】左侧边栏区域 END -->
+
+        <!-- ==========================================================
+             【CENTER-1】中间主内容区域 START
+             功能：行情展示、快捷交易面板、最近交易记录
+             宽度：自适应
+             ========================================================== -->
+        <main class="main-content">
+
+            <!-- ==========================================================
+                 【CENTER-1-A】行情头部卡片 START
+                 接口：[10] GET /api/market/price/latest
+                 ========================================================== -->
+            <div class="market-header">
+                <div class="market-info">
+                    <h2 id="marketName">黄金 AU</h2>
+                    <div class="subtitle" id="marketSubtitle">模拟交易 | 人民币/克 | 交易中</div>
+                    <div class="market-overview">
+                        <div class="overview-item">
+                            <span class="label">开盘价</span>
+                            <span class="value" id="openPrice">718.50</span>
+                        </div>
+                        <div class="overview-item">
+                            <span class="label">最高价</span>
+                            <span class="value" id="highPrice">726.30</span>
+                        </div>
+                        <div class="overview-item">
+                            <span class="label">最低价</span>
+                            <span class="value" id="lowPrice">716.80</span>
+                        </div>
+                        <div class="overview-item">
+                            <span class="label">昨收</span>
+                            <span class="value" id="preClose">720.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="market-price-area">
+                    <div class="big-price up" id="bigPrice">723.15</div>
+                    <div class="price-change up" id="priceChange">▲ +3.15 &nbsp;&nbsp; +0.44%</div>
+                </div>
+            </div>
+            <!-- 【CENTER-1-A】行情头部卡片 END -->
+
+            <!-- ==========================================================
+                 【CENTER-1-B】快捷交易面板区域 START
+                 接口：[14] POST /api/simulation/trade/buy
+                      [15] POST /api/simulation/trade/sell
+                      [20] GET /api/simulation/position/{metalType}
+                      [21] GET /api/simulation/position/{metalType}/available
+                      [29] GET /api/simulation/config
+                 ========================================================== -->
+            <div class="trade-panel">
+                <!-- 【CENTER-1-B-A】面板标题 -->
+                <div class="trade-header">
+                    <h3>🎮 快捷交易</h3>
+                    <div class="balance-tip">虚拟余额：<strong id="simBalance">100,000.00</strong></div>
+                </div>
+
+                <!-- 【CENTER-1-B-1】买卖类型切换 START -->
+                <div class="trade-type">
+                    <button class="type-btn buy active" id="btnBuyTab" onclick="switchTradeType(\'buy\')">买入</button>
+                    <button class="type-btn sell" id="btnSellTab" onclick="switchTradeType(\'sell\')">卖出</button>
+                </div>
+                <!-- 【CENTER-1-B-1】买卖类型切换 END -->
+
+                <!-- 【CENTER-1-B-2】当前品种显示 -->
+                <div class="metal-display">
+                    <div>
+                        <div class="metal-name" id="tradeMetalName">黄金 AU</div>
+                        <div class="metal-label" id="tradeMetalLabel">可买入</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="metal-price up" id="tradeMetalPrice">723.15</div>
+                        <div class="metal-label" id="tradeHoldLabel">持仓 0.0000克</div>
+                    </div>
+                </div>
+
+                <!-- 【CENTER-1-B-3】数量输入组 START -->
+                <div class="input-group">
+                    <label>交易数量</label>
+                    <div class="input-wrap">
+                        <button onclick="adjustAmount(-0.1)">−</button>
+                        <input type="number" id="tradeAmount" value="1.0000" step="0.0001" min="0.0001" oninput="calcTrade()">
+                        <span class="unit">克</span>
+                    </div>
+                </div>
+                <!-- 【CENTER-1-B-3】数量输入组 END -->
+
+                <!-- 【CENTER-1-B-4】快捷数量 START -->
+                <div class="quick-amount" id="quickAmount">
+                    <span onclick="setQuickAmount(0.1)">0.1克</span>
+                    <span onclick="setQuickAmount(0.5)">0.5克</span>
+                    <span class="active" onclick="setQuickAmount(1)">1克</span>
+                    <span onclick="setQuickAmount(5)">5克</span>
+                    <span onclick="setQuickAmount(10)">10克</span>
+                    <span onclick="setQuickAmount(\'all\')">全部</span>
+                </div>
+                <!-- 【CENTER-1-B-4】快捷数量 END -->
+
+                <!-- 【CENTER-1-B-5】金额预估显示 START -->
+                <div class="calc-grid">
+                    <div class="calc-item">
+                        <div class="label">成交金额</div>
+                        <div class="value" id="calcTradeValue">723.15</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="label">手续费(0.5%)</div>
+                        <div class="value fee" id="calcFee">3.62</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="label">总支出</div>
+                        <div class="value total" id="calcTotal">726.77</div>
+                    </div>
+                </div>
+                <!-- 【CENTER-1-B-5】金额预估显示 END -->
+
+                <!-- 【CENTER-1-B-6】交易按钮 START -->
+                <button class="trade-btn buy" id="btnTradeAction" onclick="openTradeModal()">确认买入</button>
+                <!-- 【CENTER-1-B-6】交易按钮 END -->
+
+                <!-- 【CENTER-1-B-7】规则提示 -->
+                <div class="trade-rule" id="tradeRule">最小交易 0.0001克 | 手续费率 0.5% | T+0 随时买卖</div>
+            </div>
+            <!-- 【CENTER-1-B】快捷交易面板区域 END -->
+
+            <!-- ==========================================================
+                 【CENTER-1-C】最近交易记录区域 START
+                 接口：[23] GET /api/simulation/trade/history?page=1&size=5
+                 ========================================================== -->
+            <div class="recent-trade-section">
+                <!-- 【CENTER-1-C-A】标题栏 -->
+                <div class="recent-trade-header">
+                    <h3>📋 最近交易</h3>
+                    <a href="#">查看全部 ></a>
+                </div>
+                <!-- 【CENTER-1-C-B】记录列表 START -->
+                <div class="trade-record-list" id="tradeRecordList">
+                    <!-- 由 JS 动态渲染 -->
+                </div>
+                <!-- 【CENTER-1-C-B】记录列表 END -->
+            </div>
+            <!-- 【CENTER-1-C】最近交易记录区域 END -->
+
+        </main>
+        <!-- 【CENTER-1】中间主内容区域 END -->
+
+        <!-- ==========================================================
+             【RIGHT-1】右侧边栏区域 START
+             功能：模拟资产概览、持仓分布、交易统计、排行榜入口
+             宽度：280px
+             ========================================================== -->
+        <aside class="sidebar-right">
+
+            <!-- ==========================================================
+                 【RIGHT-1-A】模拟资产概览区域 START
+                 接口：[26] GET /api/simulation/account/overview
+                 ========================================================== -->
+            <div class="info-card">
+                <!-- 【RIGHT-1-A-A】卡片标题栏 -->
+                <div class="info-card-header">
+                    <span>💰 模拟资产</span>
+                    <a onclick="refreshAssets()">刷新</a>
+                </div>
+                <!-- 【RIGHT-1-A-B】卡片内容区 START -->
+                <div class="asset-overview">
+                    <!-- 【RIGHT-1-A-1】虚拟总资产 -->
+                    <div class="asset-label">虚拟总资产</div>
+                    <div class="asset-total" id="simTotalAsset">100,000.00</div>
+                    <!-- 【RIGHT-1-A-2】资产明细网格 START -->
+                    <div class="asset-grid">
+                        <div class="asset-cell">
+                            <div class="label">可用余额</div>
+                            <div class="value" id="simAvailBalance">100,000</div>
+                        </div>
+                        <div class="asset-cell">
+                            <div class="label">持仓市值</div>
+                            <div class="value" id="simHoldValue">0</div>
+                        </div>
+                        <div class="asset-cell">
+                            <div class="label">累计盈亏</div>
+                            <div class="value" id="simTotalProfit">+0</div>
+                        </div>
+                        <div class="asset-cell">
+                            <div class="label">今日盈亏</div>
+                            <div class="value" id="simTodayProfit">+0</div>
+                        </div>
+                    </div>
+                    <!-- 【RIGHT-1-A-2】资产明细网格 END -->
+                </div>
+                <!-- 【RIGHT-1-A-B】卡片内容区 END -->
+            </div>
+            <!-- 【RIGHT-1-A】模拟资产概览区域 END -->
+
+            <!-- ==========================================================
+                 【RIGHT-1-B】持仓分布区域 START
+                 接口：[19] GET /api/simulation/position/list
+                 ========================================================== -->
+            <div class="info-card">
+                <div class="info-card-header">📊 持仓分布</div>
+                <div class="hold-dist" id="holdDist">
+                    <!-- 由 JS 动态渲染 -->
+                </div>
+            </div>
+            <!-- 【RIGHT-1-B】持仓分布区域 END -->
+
+            <!-- ==========================================================
+                 【RIGHT-1-C】交易统计区域 START
+                 接口：[28] GET /api/simulation/account/statistics
+                 ========================================================== -->
+            <div class="info-card">
+                <div class="info-card-header">📈 交易统计</div>
+                <div class="stat-grid" id="statGrid">
+                    <div class="stat-box">
+                        <div class="num" id="statTotalCount">--</div>
+                        <div class="label">总交易笔数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="num" id="statWinRate">--</div>
+                        <div class="label">胜率</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="num" id="statBuyValue">--</div>
+                        <div class="label">累计买入</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="num" id="statSellValue">--</div>
+                        <div class="label">累计卖出</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 【RIGHT-1-C】交易统计区域 END -->
+
+            <!-- ==========================================================
+                 【RIGHT-1-D】排行榜入口区域 START
+                 接口：[16] GET /api/simulation/leaderboard/top20
+                      [17] GET /api/simulation/leaderboard/my-rank
+                 ========================================================== -->
+            <div class="info-card">
+                <div class="info-card-header">
+                    <span>🏆 收益排行</span>
+                    <a href="#">Top 20 ></a>
+                </div>
+                <div class="leader-mini" id="leaderMini">
+                    <!-- 由 JS 动态渲染 -->
+                </div>
+            </div>
+            <!-- 【RIGHT-1-D】排行榜入口区域 END -->
+
+        </aside>
+        <!-- 【RIGHT-1】右侧边栏区域 END -->
+
+    </div>
+    <!-- 【MAIN-0】主体内容外层容器 END -->
+
+    <!-- ==========================================================
+         【FOOTER-1】页脚区域 START
+         ========================================================== -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>© 2026 GoldSim 模拟投资平台 | 市场有风险，投资需谨慎 | 模拟交易仅供学习，不构成投资建议</p>
+        </div>
+    </footer>
+    <!-- 【FOOTER-1】页脚区域 END -->
+
+    <!-- ==========================================================
+         【MODAL-1】交易确认弹窗区域 START
+         接口：[14] POST /api/simulation/trade/buy
+              [15] POST /api/simulation/trade/sell
+         ========================================================== -->
+    <div class="modal-overlay" id="tradeModal">
+        <div style="position:absolute;inset:0;" onclick="closeTradeModal()"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="modalTitle">确认买入</h3>
+                <button class="modal-close" onclick="closeTradeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-row">
+                    <span class="label">交易品种</span>
+                    <span class="value" id="modalMetal">黄金 AU</span>
+                </div>
+                <div class="modal-row">
+                    <span class="label">交易类型</span>
+                    <span class="value" id="modalType">买入</span>
+                </div>
+                <div class="modal-row">
+                    <span class="label">成交单价</span>
+                    <span class="value" id="modalPrice">723.15 / 克</span>
+                </div>
+                <div class="modal-row">
+                    <span class="label">交易数量</span>
+                    <span class="value" id="modalAmount">1.0000 克</span>
+                </div>
+                <div class="modal-row">
+                    <span class="label">成交金额</span>
+                    <span class="value" id="modalTradeValue">723.15</span>
+                </div>
+                <div class="modal-row">
+                    <span class="label">手续费</span>
+                    <span class="value" id="modalFee">3.62</span>
+                </div>
+                <div class="modal-row">
+                    <span class="label">总支出</span>
+                    <span class="value highlight" id="modalTotal">726.77</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeTradeModal()">取消</button>
+                <button class="modal-btn confirm buy" id="modalConfirmBtn" onclick="confirmTrade()">确认买入</button>
+            </div>
+        </div>
+    </div>
+    <!-- 【MODAL-1】交易确认弹窗区域 END -->
+
+    <!-- ==========================================================
+         【TOAST-1】消息提示区域 START
+         ========================================================== -->
+    <div class="toast" id="toast"></div>
+    <!-- 【TOAST-1】消息提示区域 END -->
+
+    <script>
+'''
+
+print(f"Part 1 length: {len(html_part1)}")
+
+# 重新生成完整的JS部分
+js_full = '''        // ================================================================
+        //  GoldSim 模拟交易页面 - JavaScript 逻辑层
+        // ================================================================
+
+        // ================================================================
+        //  【CONFIG-1】全局配置
+        // ================================================================
+        const API_BASE = 'http://localhost:8080/api';
+        const WS_BASE = 'ws://localhost:8080';
+        const FEE_RATE = 0.005; // 手续费率 0.5%
+        const MIN_AMOUNT = 0.0001; // 最小交易单位
+
+        // ================================================================
+        //  【STATE-1】全局状态
+        // ================================================================
+        let currentMetal = 'AU';          // 当前选中品种 AU/AG/PT
+        let tradeType = 'buy';            // 当前交易类型 buy/sell
+        let currentPrice = 723.15;        // 当前品种最新价
+        let simBalance = 100000;          // 虚拟余额
+        let totalProfit = 0;              // 累计盈亏
+        let positionCache = {};         // 持仓数据缓存
+        let configData = null;            // 交易配置缓存
+
+        // 品种基础数据
+        const metalData = {
+            AU: { name: '黄金', price: 723.15, open: 718.50, high: 726.30, low: 716.80, preClose: 720.00, change: 3.15, changePct: 0.44, hold: 0, avgCost: 0 },
+            AG: { name: '白银', price: 6.85, open: 6.80, high: 6.92, low: 6.78, preClose: 6.82, change: 0.03, changePct: 0.46, hold: 0, avgCost: 0 },
+            PT: { name: '铂金', price: 228.50, open: 230.00, high: 231.20, low: 227.00, preClose: 229.70, change: -1.20, changePct: -0.52, hold: 0, avgCost: 0 }
+        };
+
+        // ================================================================
+        //  【API-1】通用请求封装
+        // ================================================================
+        async function apiRequest(url, options = {}) {
+            const token = localStorage.getItem('token') || '';
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                }
+            };
+            try {
+                const response = await fetch(API_BASE + url, { ...defaultOptions, ...options });
+                const result = await response.json();
+                if (result.code === 'A00000') {
+                    return result.data;
+                } else {
+                    showToast(result.msg || '请求失败', 'error');
+                    return null;
+                }
+            } catch (err) {
+                console.error('API请求失败:', url, err);
+                return null;
+            }
+        }
+
+        // ================================================================
+        //  【API-2】行情相关接口
+        // ================================================================
+
+        /**
+         * 获取最新行情价格
+         * 接口：[10] GET /api/market/price/latest?metalType={metalType}
+         */
+        async function fetchLatestPrice(metalType) {
+            const data = await apiRequest(`/market/price/latest?metalType=${metalType}`);
+            if (data) {
+                metalData[metalType].price = parseFloat(data.latestPrice);
+                metalData[metalType].open = parseFloat(data.openPrice);
+                metalData[metalType].high = parseFloat(data.highPrice);
+                metalData[metalType].low = parseFloat(data.lowPrice);
+                metalData[metalType].preClose = parseFloat(data.preClosePrice);
+                metalData[metalType].change = parseFloat(data.latestPrice) - parseFloat(data.preClosePrice);
+                const pctStr = data.changePercent || '+0.00%';
+                metalData[metalType].changePct = parseFloat(pctStr.replace('%', '').replace('+', ''));
+            }
+            return metalData[metalType];
+        }
+
+        // ================================================================
+        //  【API-3】模拟交易接口
+        // ================================================================
+
+        /**
+         * 模拟买入
+         * 接口：[14] POST /api/simulation/trade/buy
+         */
+        async function apiBuy(metalType, amount) {
+            const requestId = 'REQ_' + Date.now();
+            return await apiRequest('/simulation/trade/buy', {
+                method: 'POST',
+                body: JSON.stringify({ requestId, metalType, amount })
+            });
+        }
+
+        /**
+         * 模拟卖出
+         * 接口：[15] POST /api/simulation/trade/sell
+         */
+        async function apiSell(metalType, amount) {
+            const requestId = 'REQ_' + Date.now();
+            return await apiRequest('/simulation/trade/sell', {
+                method: 'POST',
+                body: JSON.stringify({ requestId, metalType, amount })
+            });
+        }
+
+        /**
+         * 查询单个品种持仓
+         * 接口：[20] GET /api/simulation/position/{metalType}
+         */
+        async function fetchPosition(metalType) {
+            const data = await apiRequest(`/simulation/position/${metalType}`);
+            if (data) {
+                positionCache[metalType] = {
+                    amount: parseFloat(data.amount) || 0,
+                    avgCostPrice: parseFloat(data.avgCostPrice) || 0,
+                    floatingProfit: parseFloat(data.floatingProfit) || 0,
+                    marketValue: parseFloat(data.marketValue) || 0,
+                    floatingProfitRate: data.floatingProfitRate || '0.00%'
+                };
+                metalData[metalType].hold = parseFloat(data.amount) || 0;
+                metalData[metalType].avgCost = parseFloat(data.avgCostPrice) || 0;
+            }
+            return data;
+        }
+
+        /**
+         * 查询全部持仓列表
+         * 接口：[19] GET /api/simulation/position/list
+         */
+        async function fetchPositionList() {
+            const data = await apiRequest('/simulation/position/list');
+            if (data) {
+                data.forEach(pos => {
+                    const mt = pos.metalType;
+                    positionCache[mt] = {
+                        amount: parseFloat(pos.amount) || 0,
+                        avgCostPrice: parseFloat(pos.avgCostPrice) || 0,
+                        floatingProfit: parseFloat(pos.floatingProfit) || 0,
+                        marketValue: parseFloat(pos.marketValue) || 0,
+                        floatingProfitRate: pos.floatingProfitRate || '0.00%'
+                    };
+                    if (metalData[mt]) {
+                        metalData[mt].hold = parseFloat(pos.amount) || 0;
+                        metalData[mt].avgCost = parseFloat(pos.avgCostPrice) || 0;
+                    }
+                });
+            }
+            return data;
+        }
+
+        /**
+         * 查询可卖出数量
+         * 接口：[21] GET /api/simulation/position/{metalType}/available
+         */
+        async function fetchAvailable(metalType) {
+            const data = await apiRequest(`/simulation/position/${metalType}/available`);
+            return data ? parseFloat(data.availableAmount) || 0 : 0;
+        }
+
+        /**
+         * 查询交易记录
+         * 接口：[23] GET /api/simulation/trade/history?page=&size=&metalType=&tradeType=
+         */
+        async function fetchTradeHistory(page = 1, size = 5, metalType = '', tradeType = '') {
+            let url = `/simulation/trade/history?page=${page}&size=${size}`;
+            if (metalType) url += `&metalType=${metalType}`;
+            if (tradeType) url += `&tradeType=${tradeType}`;
+            const data = await apiRequest(url);
+            return data;
+        }
+
+        /**
+         * 查询资产总览
+         * 接口：[26] GET /api/simulation/account/overview
+         */
+        async function fetchAccountOverview() {
+            const data = await apiRequest('/simulation/account/overview');
+            if (data) {
+                simBalance = parseFloat(data.balance) || 100000;
+                totalProfit = parseFloat(data.totalProfit) || 0;
+                updateAssetDisplay(data);
+            }
+            return data;
+        }
+
+        /**
+         * 查询交易统计
+         * 接口：[28] GET /api/simulation/account/statistics
+         */
+        async function fetchStatistics() {
+            return await apiRequest('/simulation/account/statistics');
+        }
+
+        /**
+         * 查询排行榜Top20
+         * 接口：[16] GET /api/simulation/leaderboard/top20
+         */
+        async function fetchLeaderboard() {
+            return await apiRequest('/simulation/leaderboard/top20');
+        }
+
+        /**
+         * 查询我的排名
+         * 接口：[17] GET /api/simulation/leaderboard/my-rank
+         */
+        async function fetchMyRank() {
+            return await apiRequest('/simulation/leaderboard/my-rank');
+        }
+
+        /**
+         * 查询交易配置
+         * 接口：[29] GET /api/simulation/config
+         */
+        async function fetchConfig() {
+            const data = await apiRequest('/simulation/config');
+            if (data) {
+                configData = data;
+            }
+            return data;
+        }
+
+        // ================================================================
+        //  【UI-1】页面渲染函数
+        // ================================================================
+
+        /**
+         * 更新资产概览显示
+         * 接口：[26] AccountOverviewVO
+         */
+        function updateAssetDisplay(data) {
+            document.getElementById('simTotalAsset').textContent = formatMoney(data.totalAsset);
+            document.getElementById('simAvailBalance').textContent = formatMoney(data.balance);
+            document.getElementById('simHoldValue').textContent = formatMoney(data.positionMarketValue);
+            const profitEl = document.getElementById('simTotalProfit');
+            const profit = parseFloat(data.totalProfit) || 0;
+            profitEl.textContent = (profit >= 0 ? '+' : '') + formatMoney(profit);
+            profitEl.className = 'value ' + (profit >= 0 ? 'up' : 'down');
+            const todayEl = document.getElementById('simTodayProfit');
+            const today = parseFloat(data.todayProfit) || 0;
+            todayEl.textContent = (today >= 0 ? '+' : '') + formatMoney(today);
+            todayEl.className = 'value ' + (today >= 0 ? 'up' : 'down');
+            document.getElementById('simBalance').textContent = formatMoney(data.balance);
+        }
+
+        /**
+         * 渲染持仓分布
+         * 接口：[19] position/list
+         */
+        function renderHoldDist(positions) {
+            const container = document.getElementById('holdDist');
+            if (!positions || positions.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无持仓</div>';
+                return;
+            }
+            const totalMV = positions.reduce((sum, p) => sum + (parseFloat(p.marketValue) || 0), 0);
+            const colors = { AU: '#c9a96e', AG: '#a0a0a0', PT: '#cd7f32' };
+            container.innerHTML = positions.map(pos => {
+                const mv = parseFloat(pos.marketValue) || 0;
+                const pct = totalMV > 0 ? ((mv / totalMV) * 100).toFixed(1) : 0;
+                const color = colors[pos.metalType] || '#999';
+                return `
+                    <div class="dist-item">
+                        <span class="dist-dot" style="background:${color}"></span>
+                        <span>${pos.metalName || pos.metalType}</span>
+                        <b>${formatMoney(mv)}</b>
+                        <em>${pct}%</em>
+                    </div>
+                    <div class="dist-bar"><div style="width:${pct}%;background:${color}"></div></div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * 渲染交易统计
+         * 接口：[28] TradeStatisticsVO
+         */
+        function renderStatistics(data) {
+            if (!data) return;
+            document.getElementById('statTotalCount').textContent = data.totalTradeCount || 0;
+            document.getElementById('statWinRate').textContent = data.winRate || '0%';
+            document.getElementById('statBuyValue').textContent = formatMoney(data.totalBuyValue);
+            document.getElementById('statSellValue').textContent = formatMoney(data.totalSellValue);
+        }
+
+        /**
+         * 渲染排行榜迷你版
+         * 接口：[16] LeaderboardVO + [17] UserRankVO
+         */
+        function renderLeaderMini(list, myRank) {
+            const container = document.getElementById('leaderMini');
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无数据</div>';
+                return;
+            }
+            let html = '';
+            list.slice(0, 3).forEach((item, index) => {
+                const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze';
+                html += `
+                    <div class="rank-mini ${rankClass}">
+                        <span class="rank-num">${item.rank || (index + 1)}</span>
+                        <span class="nickname">${item.nickname || '用户***'}</span>
+                        <span class="profit">+${formatMoney(item.totalProfit)}</span>
+                    </div>
+                `;
+            });
+            // 我的排名
+            if (myRank) {
+                const myRankNum = myRank.onList ? (myRank.rank || '--') : '未上榜';
+                html += `
+                    <div class="rank-mini" style="border-top:1px solid #f0f0f0;margin-top:4px;padding-top:10px;">
+                        <span class="rank-num">${myRank.onList ? myRank.rank : '--'}</span>
+                        <span class="nickname">我 (${myRankNum})</span>
+                        <span class="profit">${myRank.totalProfit >= 0 ? '+' : ''}${formatMoney(myRank.totalProfit)}</span>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        /**
+         * 渲染最近交易记录
+         * 接口：[23] TradeRecordVO
+         */
+        function renderTradeRecords(records) {
+            const container = document.getElementById('tradeRecordList');
+            if (!records || records.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">暂无交易记录</div>';
+                return;
+            }
+            container.innerHTML = records.map(record => {
+                const isBuy = record.tradeType === 'BUY';
+                const typeClass = isBuy ? 'buy' : 'sell';
+                const typeName = isBuy ? '买入' : '卖出';
+                const amount = parseFloat(record.amount) || 0;
+                const price = parseFloat(record.price) || 0;
+                const fee = parseFloat(record.fee) || 0;
+                const total = isBuy
+                    ? -(amount * price + fee)
+                    : (amount * price - fee);
+                const timeStr = formatTime(record.createTime);
+                return `
+                    <div class="trade-record-item">
+                        <span class="trade-type-tag ${typeClass}">${typeName}</span>
+                        <div class="trade-record-info">
+                            <div class="metal-name">${record.metalName || record.metalType} ${record.metalType}</div>
+                            <div class="trade-detail">${amount.toFixed(4)} 克 x ${price.toFixed(2)}</div>
+                        </div>
+                        <div class="trade-record-amount">
+                            <div class="value">${total >= 0 ? '+' : ''}${formatMoney(Math.abs(total))}</div>
+                            <div class="time">${timeStr}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * 更新左侧品种持仓显示
+         */
+        function updateSymbolHold(metal) {
+            const pos = positionCache[metal];
+            const holdEl = document.getElementById('symHold' + metal);
+            if (!pos || pos.amount <= 0) {
+                holdEl.innerHTML = '持仓: <span class="hold-amount">0.0000克</span> <em class="hold-profit">--</em>';
+                return;
+            }
+            const profit = pos.floatingProfit || 0;
+            const profitClass = profit > 0 ? 'up' : profit < 0 ? 'down' : '';
+            const profitStr = profit > 0 ? '+' + formatMoney(profit) : formatMoney(profit);
+            holdEl.innerHTML = `持仓: <span class="hold-amount">${pos.amount.toFixed(4)}克</span> <em class="hold-profit ${profitClass}">${profitStr}</em>`;
+        }
+
+        /**
+         * 更新持仓明细面板
+         */
+        function updatePositionDetail(metal) {
+            const pos = positionCache[metal];
+            const data = metalData[metal];
+            document.getElementById('posDetailTitle').textContent = '📊 ' + data.name + ' ' + metal + '持仓明细';
+            if (!pos || pos.amount <= 0) {
+                document.getElementById('posAmount').textContent = '0.0000 克';
+                document.getElementById('posAvgCost').textContent = '--';
+                document.getElementById('posMarketValue').textContent = '0.00';
+                document.getElementById('posFloatingProfit').textContent = '--';
+                document.getElementById('posProfitRate').textContent = '--';
+                return;
+            }
+            const mv = pos.amount * data.price;
+            const profit = pos.floatingProfit || 0;
+            const rate = pos.avgCostPrice > 0 ? ((data.price - pos.avgCostPrice) / pos.avgCostPrice * 100) : 0;
+            document.getElementById('posAmount').textContent = pos.amount.toFixed(4) + ' 克';
+            document.getElementById('posAvgCost').textContent = formatMoney(pos.avgCostPrice) + '/克';
+            document.getElementById('posMarketValue').textContent = formatMoney(mv);
+            const profitEl = document.getElementById('posFloatingProfit');
+            profitEl.textContent = (profit >= 0 ? '+' : '') + formatMoney(profit);
+            profitEl.className = 'value ' + (profit >= 0 ? 'up' : 'down');
+            const rateEl = document.getElementById('posProfitRate');
+            rateEl.textContent = (rate >= 0 ? '+' : '') + rate.toFixed(2) + '%';
+            rateEl.className = 'value ' + (rate >= 0 ? 'up' : 'down');
+        }
+
+        // ================================================================
+        //  【UI-2】品种切换与行情更新
+        // ================================================================
+
+        async function switchMetal(metal) {
+            currentMetal = metal;
+            const data = metalData[metal];
+            currentPrice = data.price;
+
+            // 更新左侧激活状态
+            document.querySelectorAll('.symbol-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`[data-metal="${metal}"]`).classList.add('active');
+
+            // 更新行情头部
+            document.getElementById('marketName').textContent = data.name + ' ' + metal;
+            document.getElementById('openPrice').textContent = data.open.toFixed(2);
+            document.getElementById('highPrice').textContent = data.high.toFixed(2);
+            document.getElementById('lowPrice').textContent = data.low.toFixed(2);
+            document.getElementById('preClose').textContent = data.preClose.toFixed(2);
+
+            const bigPriceEl = document.getElementById('bigPrice');
+            const changeEl = document.getElementById('priceChange');
+            bigPriceEl.textContent = formatMoney(data.price);
+            if (data.change >= 0) {
+                bigPriceEl.className = 'big-price up';
+                changeEl.className = 'price-change up';
+                changeEl.innerHTML = '▲ +' + data.change.toFixed(2) + ' &nbsp;&nbsp; +' + data.changePct.toFixed(2) + '%';
+            } else {
+                bigPriceEl.className = 'big-price down';
+                changeEl.className = 'price-change down';
+                changeEl.innerHTML = '▼ ' + data.change.toFixed(2) + ' &nbsp;&nbsp; ' + data.changePct.toFixed(2) + '%';
+            }
+
+            // 更新交易面板
+            document.getElementById('tradeMetalName').textContent = data.name + ' ' + metal;
+            document.getElementById('tradeMetalPrice').textContent = formatMoney(data.price);
+            updateTradePanelLabels();
+
+            // 更新持仓显示
+            updateSymbolHold(metal);
+            updatePositionDetail(metal);
+
+            // 重新计算交易金额
+            calcTrade();
+
+            // 异步获取最新持仓
+            await fetchPosition(metal);
+            updateSymbolHold(metal);
+            updatePositionDetail(metal);
+            updateTradePanelLabels();
+        }
+
+        function updateTradePanelLabels() {
+            const data = metalData[currentMetal];
+            const label = document.getElementById('tradeMetalLabel');
+            const holdLabel = document.getElementById('tradeHoldLabel');
+            if (tradeType === 'buy') {
+                label.textContent = '可买入';
+                holdLabel.textContent = '持仓 ' + data.hold.toFixed(4) + '克';
+            } else {
+                label.textContent = '可卖出 ' + data.hold.toFixed(4) + '克';
+                holdLabel.textContent = '持仓 ' + data.hold.toFixed(4) + '克';
+            }
+        }
+
+        // ================================================================
+        //  【UI-3】交易面板逻辑
+        // ================================================================
+
+        function switchTradeType(type) {
+            tradeType = type;
+            document.getElementById('btnBuyTab').className = 'type-btn buy' + (type === 'buy' ? ' active' : '');
+            document.getElementById('btnSellTab').className = 'type-btn sell' + (type === 'sell' ? ' active' : '');
+            const btn = document.getElementById('btnTradeAction');
+            btn.className = 'trade-btn ' + type;
+            btn.textContent = type === 'buy' ? '确认买入' : '确认卖出';
+            updateTradePanelLabels();
+            calcTrade();
+        }
+
+        function adjustAmount(delta) {
+            const input = document.getElementById('tradeAmount');
+            let val = parseFloat(input.value) || 0;
+            val = Math.max(MIN_AMOUNT, val + delta);
+            input.value = val.toFixed(4);
+            calcTrade();
+        }
+
+        function setQuickAmount(val) {
+            const input = document.getElementById('tradeAmount');
+            if (val === 'all') {
+                if (tradeType === 'sell') {
+                    input.value = (metalData[currentMetal].hold || MIN_AMOUNT).toFixed(4);
+                } else {
+                    const max = Math.floor(simBalance / currentPrice * 10000) / 10000;
+                    input.value = Math.max(MIN_AMOUNT, max).toFixed(4);
+                }
+            } else {
+                input.value = val.toFixed(4);
+            }
+            // 更新快捷按钮激活状态
+            document.querySelectorAll('.quick-amount span').forEach(s => s.classList.remove('active'));
+            event.target.classList.add('active');
+            calcTrade();
+        }
+
+        function calcTrade() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+            const price = currentPrice;
+            const tradeValue = amount * price;
+            const fee = tradeValue * FEE_RATE;
+            const total = tradeType === 'buy' ? tradeValue + fee : tradeValue - fee;
+
+            document.getElementById('calcTradeValue').textContent = formatMoney(tradeValue);
+            document.getElementById('calcFee').textContent = formatMoney(fee);
+            document.getElementById('calcTotal').textContent = formatMoney(total);
+        }
+
+        // ================================================================
+        //  【UI-4】交易弹窗
+        // ================================================================
+
+        function openTradeModal() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+            if (amount < MIN_AMOUNT) {
+                showToast('交易数量不能小于 ' + MIN_AMOUNT + ' 克', 'error');
+                return;
+            }
+            if (tradeType === 'sell') {
+                const hold = metalData[currentMetal].hold;
+                if (hold < amount) {
+                    showToast('持仓不足，无法卖出（当前持仓 ' + hold.toFixed(4) + ' 克）', 'error');
+                    return;
+                }
+            }
+            if (tradeType === 'buy') {
+                const total = parseFloat(document.getElementById('calcTotal').textContent.replace(/[,]/g, ''));
+                if (total > simBalance) {
+                    showToast('虚拟余额不足', 'error');
+                    return;
+                }
+            }
+
+            const data = metalData[currentMetal];
+            document.getElementById('modalTitle').textContent = tradeType === 'buy' ? '确认买入' : '确认卖出';
+            document.getElementById('modalMetal').textContent = data.name + ' ' + currentMetal;
+            document.getElementById('modalType').textContent = tradeType === 'buy' ? '买入' : '卖出';
+            document.getElementById('modalPrice').textContent = formatMoney(data.price) + ' / 克';
+            document.getElementById('modalAmount').textContent = amount.toFixed(4) + ' 克';
+            document.getElementById('modalTradeValue').textContent = document.getElementById('calcTradeValue').textContent;
+            document.getElementById('modalFee').textContent = document.getElementById('calcFee').textContent;
+            document.getElementById('modalTotal').textContent = document.getElementById('calcTotal').textContent;
+
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            confirmBtn.className = 'modal-btn confirm ' + tradeType;
+            confirmBtn.textContent = tradeType === 'buy' ? '确认买入' : '确认卖出';
+
+            document.getElementById('tradeModal').classList.add('active');
+        }
+
+        function closeTradeModal() {
+            document.getElementById('tradeModal').classList.remove('active');
+        }
+
+        /**
+         * 确认交易（调用真实API）
+         */
+        async function confirmTrade() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+
+            let result;
+            if (tradeType === 'buy') {
+                result = await apiBuy(currentMetal, amount);
+            } else {
+                result = await apiSell(currentMetal, amount);
+            }
+
+            if (result) {
+                showToast(tradeType === 'buy'
+                    ? '买入成功！扣除虚拟资金 ' + formatMoney(result.totalCost)
+                    : '卖出成功！到账虚拟资金 ' + formatMoney(result.netIncome), 'success');
+
+                // 刷新相关数据
+                await refreshAssets();
+                await fetchPosition(currentMetal);
+                updateSymbolHold(currentMetal);
+                updatePositionDetail(currentMetal);
+                updateTradePanelLabels();
+
+                const history = await fetchTradeHistory(1, 5);
+                if (history && history.list) {
+                    renderTradeRecords(history.list);
+                }
+            } else {
+                mockTradeExecute();
+            }
+
+            closeTradeModal();
+        }
+
+        /**
+         * Mock交易执行（API不可用时）
+         */
+        function mockTradeExecute() {
+            const amount = parseFloat(document.getElementById('tradeAmount').value) || 0;
+            const data = metalData[currentMetal];
+            const tradeValue = amount * data.price;
+            const fee = tradeValue * FEE_RATE;
+
+            if (tradeType === 'buy') {
+                simBalance -= (tradeValue + fee);
+                data.hold += amount;
+                if (data.avgCost === 0) {
+                    data.avgCost = data.price;
+                } else {
+                    data.avgCost = (data.avgCost * (data.hold - amount) + data.price * amount) / data.hold;
+                }
+                totalProfit -= fee;
+                showToast('买入成功！扣除虚拟资金 ' + formatMoney(tradeValue + fee), 'success');
+            } else {
+                simBalance += (tradeValue - fee);
+                data.hold -= amount;
+                const profit = tradeValue - (amount * data.avgCost);
+                totalProfit += profit - fee;
+                showToast('卖出成功！到账虚拟资金 ' + formatMoney(tradeValue - fee), 'success');
+            }
+
+            // 更新本地显示
+            document.getElementById('simBalance').textContent = formatMoney(simBalance);
+            document.getElementById('simTotalAsset').textContent = formatMoney(simBalance + data.hold * data.price);
+            document.getElementById('simAvailBalance').textContent = formatMoney(simBalance);
+            document.getElementById('simHoldValue').textContent = formatMoney(data.hold * data.price);
+            const profitEl = document.getElementById('simTotalProfit');
+            profitEl.textContent = (totalProfit >= 0 ? '+' : '') + formatMoney(totalProfit);
+            profitEl.className = 'value ' + (totalProfit >= 0 ? 'up' : 'down');
+            updateSymbolHold(currentMetal);
+            updatePositionDetail(currentMetal);
+            updateTradePanelLabels();
+        }
+
+        // ================================================================
+        //  【UI-5】资产刷新
+        // ================================================================
+
+        async function refreshAssets() {
+            await fetchAccountOverview();
+            await fetchPositionList();
+            // 更新所有品种持仓显示
+            ['AU', 'AG', 'PT'].forEach(m => updateSymbolHold(m));
+            updatePositionDetail(currentMetal);
+            // 更新持仓分布
+            const positions = await fetchPositionList();
+            if (positions) renderHoldDist(positions);
+            // 更新统计
+            const stats = await fetchStatistics();
+            if (stats) renderStatistics(stats);
+            showToast('资产已刷新', 'success');
+        }
+
+        // ================================================================
+        //  【UI-6】Toast 提示
+        // ================================================================
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ================================================================
+        //  【UTIL-1】工具函数
+        // ================================================================
+
+        function formatMoney(num) {
+            if (num === undefined || num === null || isNaN(num)) return '0.00';
+            const n = parseFloat(num);
+            if (n >= 1000) {
+                return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            return n.toFixed(2);
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '刚刚';
+            const date = new Date(timeStr);
+            const now = new Date();
+            const diff = (now - date) / 1000;
+            if (diff < 60) return '刚刚';
+            if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+            if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+            if (diff < 172800) return '昨天';
+            return (date.getMonth() + 1) + '月' + date.getDate() + '日';
+        }
+
+        // ================================================================
+        //  【INIT-1】页面初始化
+        // ================================================================
+
+        async function initPage() {
+            // 1. 加载交易配置
+            await fetchConfig();
+
+            // 2. 加载资产总览
+            const overview = await fetchAccountOverview();
+            if (!overview) {
+                // Mock模式默认值
+                document.getElementById('simTotalAsset').textContent = '100,000.00';
+                document.getElementById('simAvailBalance').textContent = '100,000';
+                document.getElementById('simHoldValue').textContent = '0';
+                document.getElementById('simTotalProfit').textContent = '+0';
+                document.getElementById('simTodayProfit').textContent = '+0';
+            }
+
+            // 3. 加载全部持仓（用于左侧显示和持仓分布）
+            const positions = await fetchPositionList();
+            if (positions) {
+                positions.forEach(pos => updateSymbolHold(pos.metalType));
+                renderHoldDist(positions);
+            }
+
+            // 4. 加载当前品种持仓明细
+            await fetchPosition(currentMetal);
+            updateSymbolHold(currentMetal);
+            updatePositionDetail(currentMetal);
+
+            // 5. 加载最近交易记录
+            const history = await fetchTradeHistory(1, 5);
+            if (history && history.list) {
+                renderTradeRecords(history.list);
+            }
+
+            // 6. 加载交易统计
+            const stats = await fetchStatistics();
+            if (stats) renderStatistics(stats);
+
+            // 7. 加载排行榜
+            const [leaderboard, myRank] = await Promise.all([
+                fetchLeaderboard(),
+                fetchMyRank()
+            ]);
+            if (leaderboard) renderLeaderMini(leaderboard, myRank);
+
+            // 8. 计算交易金额
+            calcTrade();
+
+            // 9. 定时刷新（每30秒）
+            setInterval(async () => {
+                await fetchLatestPrice(currentMetal);
+                await fetchAccountOverview();
+                await fetchPosition(currentMetal);
+                updateSymbolHold(currentMetal);
+                updatePositionDetail(currentMetal);
+                updateTradePanelLabels();
+            }, 30000);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>'''
+
+print(f"JS part length: {len(js_full)}")

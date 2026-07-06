@@ -1,0 +1,30 @@
+server:
+  port: 8088
+
+spring:
+  sql:
+    init:
+      dependency-detection: false
+  config:
+    import: optional:nacos:gold-file-service.yaml?refresh=true
+  application:
+    name: gold-file-service
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: xxx
+      config:
+        server-addr: xxx
+
+# 阿里云 OSS（从环境变量读取）
+ff:
+  oss:
+    endpoint: xxxxx
+    access-key-id: xxxx
+    access-key-secret: Xxxxx
+    bucket-name: xxxx
+
+logging:
+  level:
+    com.gold: debug

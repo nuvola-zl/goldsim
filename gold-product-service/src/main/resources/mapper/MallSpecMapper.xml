@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gold.product.mapper.MallGoodsSpecMapper">
+
+    <update id="updateStockReduce">
+        UPDATE mall_goods_spec
+        SET stock = stock - #{num}, frozen_stock = frozen_stock - #{num}
+        WHERE id = #{specId} AND frozen_stock >= #{num}
+    </update>
+
+    <update id="freezeStock">
+        UPDATE mall_goods_spec
+        SET frozen_stock = frozen_stock + #{num}
+        WHERE id = #{specId} AND (stock - frozen_stock) >= #{num}
+    </update>
+
+    <update id="unFreezeStock">
+        UPDATE mall_goods_spec
+        SET frozen_stock = frozen_stock - #{num}
+        WHERE id = #{specId} AND frozen_stock >= #{num}
+    </update>
+
+    <update id="deductStockOnly">
+        UPDATE mall_goods_spec
+        SET stock = stock - #{num}
+        WHERE id = #{specId} AND stock >= #{num}
+    </update>
+
+</mapper>

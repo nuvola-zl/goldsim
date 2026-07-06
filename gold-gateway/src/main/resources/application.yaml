@@ -1,0 +1,155 @@
+server:
+  port: 8080
+
+spring:
+  config:
+    import: nacos:gold-gateway.yaml?refresh=true
+  application:
+    name: gold-gateway
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      metrics:
+        enabled: false
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - http://localhost:5173
+              - http://localhost:3002
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+
+      routes:
+        - id: gold-user-service
+          uri: lb://gold-user-service
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=1
+        - id: gold-market-service
+          uri: lb://gold-market-service
+          predicates:
+            - Path=/api/market/**
+          filters:
+            - StripPrefix=1
+        - id: gold-simulation-service
+          uri: lb://gold-simulation-service
+          predicates:
+            - Path=/api/simulation/**
+          filters:
+            - StripPrefix=1
+        - id: gold-flash-sale-service
+          uri: lb://gold-flash-sale-service
+          predicates:
+            - Path=/api/flash/**
+          filters:
+            - StripPrefix=1
+        - id: gold-mall-service
+          uri: lb://gold-mall-service
+          predicates:
+            - Path=/api/mall/**
+          filters:
+            - StripPrefix=1
+        - id: gold-store-service
+          uri: lb://gold-store-service
+          predicates:
+            - Path=/api/store/**
+          filters:
+            - StripPrefix=1
+
+
+        - id: gold-news-service
+          uri: lb://gold-news-service
+          predicates:
+            - Path=/api/news/**
+          filters:
+            - StripPrefix=1
+
+
+        - id: gold-admin-service
+          uri: lb://gold-admin-service
+          predicates:
+            - Path=/api/admin/**
+          filters:
+            - StripPrefix=1
+
+
+        - id: gold-order-service
+          uri: lb://gold-order-service
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=1
+
+        - id: gold-file-service
+          uri: lb://gold-file-service
+          predicates:
+            - Path=/api/file/**
+          filters:
+            - StripPrefix=1
+
+        - id: gold-product-service
+          uri: lb://gold-product-service
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=1   # 剥离 /api，保留 /product/**
+
+        # WebSocket 路由，无StripPrefix，无需截断前缀
+        - id: gold-market-websocket
+          uri: lb://gold-market-service
+          predicates:
+            - Path=/ws/market/**
+          metadata:
+            websocket-enabled: true   # ← 加这个
+
+        - id: gold-simulation-websocket
+          uri: lb://gold-simulation-service
+          predicates:
+            - Path=/ws/leaderboard/**
+          metadata:
+            websocket-enabled: true   # ← 加这个
+
+
+    nacos:
+      discovery:
+        server-addr: 192.168.153.129:8848
+      config:
+        server-addr: 192.168.153.129:8848
+        file-extension: yaml
+        import-check:
+          enabled: false
+
+    sentinel:
+      enabled: true
+      transport:
+        dashboard: 192.168.43.222:8090
+      eager: true
+      scg:
+        enabled: true
+      nacos:
+        server-addr: 192.168.153.129:8848
+
+  data:
+    redis:
+      host: 192.168.153.129
+      port: 6379
+      database: 0
+
+sa-token:
+  token-name: Authorization
+  timeout: 86400
+  active-timeout: 1800
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-read-cookie: false
+  is-read-header: true
+
+logging:
+  level:
+    org.springframework.cloud.gateway: debug

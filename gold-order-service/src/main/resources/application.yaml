@@ -1,0 +1,78 @@
+server:
+  port: 8084
+
+spring:
+  config:
+    import: optional:nacos:gold-order-service.yaml?refresh=true
+  application:
+    name: gold-order-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/goldsim?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      host: 192.168.153.129
+      port: 6379
+      database: 0
+
+  rabbitmq:
+    host: 192.168.153.129
+    port: 5672
+    username: goldsim
+    password: '123'
+    virtual-host: /goldsim
+    listener:
+      simple:
+        acknowledge-mode: auto
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1000ms
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.153.129:8848
+      config:
+        server-addr: 192.168.153.129:8848
+        file-extension: yaml
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    com.gold: debug
+
+alipay:
+  app-id:
+  private-key: ""
+  alipay-public-key:
+  notify-url:
+  return-url:
+
+
+
+#todo
+#seata:
+#  enabled: true
+#  application-id: ${spring.application.name}
+#  tx-service-group: order_tx_group
+#  registry:
+#    type: nacos
+#    nacos:
+#      server-addr: ${spring.cloud.nacos.discovery.server-addr:127.0.0.1:8848}
+#      namespace: public
+#      group: SEATA_GROUP
+#  config:
+#    type: nacos
+#    nacos:
+#      server-addr: ${spring.cloud.nacos.discovery.server-addr:127.0.0.1:8848}
+#      namespace: public
+#      group: SEATA_GROUP

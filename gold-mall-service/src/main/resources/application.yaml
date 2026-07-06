@@ -1,0 +1,26 @@
+server:
+  port: 8085
+
+spring:
+  config:
+    import: optional:nacos:gold-mall-service.yaml?refresh=true
+  application:
+    name: gold-mall-service
+
+  data:
+    redis:
+      host: 192.168.153.129
+      port: 6379
+      database: 0
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.153.129:8848
+      config:
+        server-addr: 192.168.153.129:8848
+        file-extension: yaml
+
+logging:
+  level:
+    com.gold: debug

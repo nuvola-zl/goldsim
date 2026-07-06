@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gold.product.mapper.GoodsShowMapper">
+
+    <select id="selectGoodsBaseList" resultType="com.gold.mallApi.domain.vo.GoodsListVO">
+        SELECT
+        g.id AS goodsId,
+        g.goods_name AS goodsName,
+        g.category,
+        g.metal_type AS metalType,
+        g.store_id AS storeId
+        FROM mall_goods g
+        <where>
+            <if test="category != null and category != ''">
+                AND g.category = #{category}
+            </if>
+            <if test="metalType != null and metalType != ''">
+                AND g.metal_type = #{metalType}
+            </if>
+        </where>
+        ORDER BY g.sort DESC
+    </select>
+
+    <select id="selectDefaultSpecsByGoodsIds" resultType="com.gold.mallApi.domain.vo.GoodsListVO">
+        SELECT
+        s1.goods_id AS goodsId,
+        s1.id AS specId,
+        s1.weight,
+        s1.total_price AS totalPrice,
+        s1.cover_image AS coverImage
+        FROM mall_goods_spec s1
+        INNER JOIN (
+        SELECT goods_id, MIN(weight) as min_weight
+        FROM mall_goods_spec
+        WHERE sale_status = 1
+        AND goods_id IN
+        <foreach collection="goodsIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        GROUP BY goods_id
+        ) s2 ON s1.goods_id = s2.goods_id AND s1.weight = s2.min_weight
+        WHERE s1.sale_status = 1
+        AND s1.id = (
+        SELECT MIN(id) FROM mall_goods_spec s3
+        WHERE s3.goods_id = s1.goods_id
+        AND s3.weight = s1.weight
+        AND s3.sale_status = 1
+        )
+    </select>
+
+</mapper>

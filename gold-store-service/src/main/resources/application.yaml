@@ -1,0 +1,59 @@
+server:
+  port: 8087
+
+spring:
+  sql:
+    init:
+      dependency-detection: false
+  config:
+    import: optional:nacos:gold-store-service.yaml?refresh=true
+  application:
+    name: gold-store-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/goldsim?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      host: 192.168.153.129
+      port: 6379
+      database: 0
+
+  # ========== RabbitMQ 配置 ==========
+  rabbitmq:
+    host: 192.168.153.129
+    port: 5672              # Java 连接用 5672，不是 15672
+    username: goldsim
+    password: '123'
+    virtual-host: /goldsim         # 默认虚拟主机，如果有其他填对应的
+    listener:
+      simple:
+        acknowledge-mode: auto   # 自动确认，生产环境建议 manual
+        retry:
+          enabled: true          # 消费失败重试
+          max-attempts: 3        # 最多重试 3 次
+          initial-interval: 1000ms  # 首次重试间隔 1 秒
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.153.129:8848
+      config:
+        server-addr: 192.168.153.129:8848
+        file-extension: yaml
+        import-check:
+          enabled: false
+
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    com.gold: debug
+

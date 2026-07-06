@@ -1,0 +1,54 @@
+GoldSim 新闻服务页 — 完整功能-接口-路径映射表
+表格
+页面位置（注释标记）	功能描述	接口路径（网关路由）	后端服务	Controller	方法签名	是否存在	认证
+【TOP-1】顶部跑马灯	实时行情价格滚动	GET /api/market/price/latest?metalType={AU/AG/PT}	gold-market-service	MarketController	getLatestPrice(String metalType)	✅ 已存在	否
+【HEADER-1-A-2a】搜索框	新闻关键词搜索	GET /api/news/search?keyword={keyword}&category=&days=&sortBy=time&page=1&size=10	gold-news-service	NewsController	search(String keyword, String category, Integer days, String sortBy, Integer page, Integer size)	✅ 已存在	是
+【LEFT-3-A】新闻分类筛选	按分类筛选新闻	GET /api/news/list?page=1&size=10&category={category}	gold-news-service	NewsController	list(Integer page, Integer size, String category)	✅ 已存在	否
+【LEFT-3-A】分类列表	获取所有分类枚举	GET /api/news/categories	gold-news-service	NewsController	categories()	✅ 已存在	否
+【LEFT-3-B】热门标签	热门标签云	GET /api/news/tags	gold-news-service	NewsController	tags()	✅ 已存在	是
+【LEFT-3-C】AI每日简报	AI生成的财经简报	GET /api/news/ai-brief	gold-news-service	NewsController	aiBrief()	✅ 已存在	否
+【CENTER-3-A】新闻列表	分页新闻列表	GET /api/news/list?page={page}&size={size}&category={category}	gold-news-service	NewsController	list(Integer page, Integer size, String category)	✅ 已存在	否
+【CENTER-3-A】排序切换	按时间/浏览量排序	GET /api/news/search?sortBy=time/views	gold-news-service	NewsController	search(...)	✅ 已存在	是
+【CENTER-3-A】热门新闻	热门新闻Top列表	GET /api/news/hot?days=7	gold-news-service	NewsController	hot(Integer days)	✅ 已存在	是
+【CENTER-3-B】新闻详情	单条新闻完整内容	GET /api/news/{id}	gold-news-service	NewsController	getById(Long id)	✅ 已存在	是
+【CENTER-3-B】相关新闻	品种相关新闻推荐	GET /api/news/relate/{metalType}	gold-news-service	NewsController	relate(String metalType)	✅ 已存在	是
+【CENTER-3-B】浏览量+1	访问详情自动计数	GET /api/news/{id}（内部 viewCount++）	gold-news-service	NewsController	getById(Long id)	✅ 已存在	是
+【RIGHT-3-A】AI简报卡片	右侧AI简报展示	GET /api/news/ai-brief	gold-news-service	NewsController	aiBrief()	✅ 已存在	否
+【RIGHT-3-B】热门排行	7天热门Top10	GET /api/news/hot?days=7	gold-news-service	NewsController	hot(Integer days)	✅ 已存在	是
+【RIGHT-3-C】最新资讯	最新发布的新闻	GET /api/news/list?page=1&size=5	gold-news-service	NewsController	list(...)	✅ 已存在	否
+【BOTTOM-1-A】市场动态	底部新闻列表	GET /api/news/list?page=1&size=5	gold-news-service	NewsController	list(...)	✅ 已存在	否
+【BOTTOM-1-B】交易指南	静态帮助链接	-	-	-	-	-	-
+【BOTTOM-1-C】热门活动	活动列表	GET /api/mall/activity/ongoing?page=1&size=3	gold-mall-service	ActivityShowController	ongoing(Integer page, Integer size)	✅ 已存在	是
+后端Controller详细路径映射（新闻服务专用）
+表格
+服务名	Controller类	@RequestMapping	方法	完整内部路径	网关路由前缀
+gold-news-service	NewsController	/news	list(Integer page, Integer size, String category)	/news/list	/api/news/list
+gold-news-service	NewsController	/news	getById(Long id)	/news/{id}	/api/news/{id}
+gold-news-service	NewsController	/news	search(String keyword, String category, Integer days, String sortBy, Integer page, Integer size)	/news/search	/api/news/search
+gold-news-service	NewsController	/news	hot(Integer days)	/news/hot	/api/news/hot
+gold-news-service	NewsController	/news	relate(String metalType)	/news/relate/{metalType}	/api/news/relate/{metalType}
+gold-news-service	NewsController	/news	tags()	/news/tags	/api/news/tags
+gold-news-service	NewsController	/news	categories()	/news/categories	/api/news/categories
+gold-news-service	NewsController	/news	aiBrief()	/news/ai-brief	/api/news/ai-brief
+测试/管理接口（用户端不展示）
+表格
+接口路径	功能	认证要求	用户端是否展示
+GET /api/news/sync-now	手动触发新闻同步	管理员	❌ 否
+GET /api/news/test-ai	测试AI简报生成	管理员	❌ 否
+接口返回数据结构速查
+表格
+接口	返回类型	关键字段
+GET /api/news/list	Page<NewsArticle>	id, title, summary, source, sourceUrl, category, tags, viewCount, status, publishTime
+GET /api/news/{id}	NewsArticle	同上 + 完整正文（若有）
+GET /api/news/search	List<NewsArticleDoc>	id, title, summary, source, category, tags, viewCount, publishTime（ES索引）
+GET /api/news/hot	List<NewsArticle>	同list，按viewCount降序
+GET /api/news/relate/{metalType}	List<NewsArticle>	根据metalType匹配分类标签
+GET /api/news/tags	List<String>	热门标签字符串列表
+GET /api/news/categories	List<String>	分类枚举值列表
+GET /api/news/ai-brief	AiBriefVO	date, items[{title, summary, source, category, url}]
+需要扩展/补充的接口（⚠️标记项汇总）
+表格
+功能位置	当前问题	建议扩展方案
+新闻详情页-原文跳转	sourceUrl 字段已有，但需确认是否可点击跳转	确保 NewsArticle.sourceUrl 字段非空，前端 <a> 标签直接跳转
+新闻详情页-分享功能	无分享统计接口	如需记录分享次数，可扩展 POST /api/news/{id}/share 接口
+新闻详情页-收藏功能	无收藏相关接口	如需收藏功能，可扩展用户服

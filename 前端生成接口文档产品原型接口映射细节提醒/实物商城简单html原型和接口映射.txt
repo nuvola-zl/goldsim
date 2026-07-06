@@ -1,0 +1,1034 @@
+
+html_content = '''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoldSim 实物商城 - 投资金条·首饰·金币</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5; color: #333; min-width: 1200px;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* ============================================================
+           【BG-1】页面全局背景层
+           ============================================================ */
+
+        /* ============================================================
+           【TOP-1】顶部跑马灯行情区域
+           接口对应：[10] GET /api/market/price/latest
+           ============================================================ */
+        .ticker-bar {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff; height: 40px; line-height: 40px;
+            overflow: hidden; position: relative;
+        }
+        .ticker-content {
+            display: flex; animation: ticker 30s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .ticker-item {
+            display: inline-flex; align-items: center;
+            padding: 0 30px; font-size: 14px;
+        }
+        .ticker-item .name { color: #c9a96e; font-weight: 600; margin-right: 8px; }
+        .ticker-item .price { font-weight: 700; margin-right: 8px; }
+        .ticker-item .change-up { color: #ff4d4f; }
+        .ticker-item .change-down { color: #52c41a; }
+
+        /* ============================================================
+           【HEADER-1】头部导航区域
+           ============================================================ */
+        .header {
+            background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .header-top {
+            width: 1200px; margin: 0 auto; padding: 20px 0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; font-size: 28px;
+        }
+        .logo-text h1 { font-size: 24px; color: #1a1a2e; font-weight: 700; letter-spacing: 1px; }
+        .logo-text p { font-size: 12px; color: #999; margin-top: 2px; }
+        .search-area { flex: 1; max-width: 500px; margin: 0 40px; }
+        .search-box { display: flex; border: 2px solid #c9a96e; border-radius: 8px; overflow: hidden; }
+        .search-box input { flex: 1; padding: 12px 16px; border: none; outline: none; font-size: 14px; }
+        .search-box button {
+            padding: 0 24px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; border: none; font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        .user-area { display: flex; align-items: center; gap: 20px; }
+        .user-area a { font-size: 14px; color: #666; transition: color 0.3s; }
+        .user-area a:hover { color: #c9a96e; }
+        .btn-login {
+            padding: 8px 24px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff !important; border-radius: 6px; font-weight: 600;
+        }
+        .nav-bar { background: #1a1a2e; height: 50px; line-height: 50px; }
+        .nav-content { width: 1200px; margin: 0 auto; display: flex; align-items: center; }
+        .nav-category {
+            width: 220px; background: #c9a96e; color: #fff;
+            text-align: center; font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+        .nav-menu { display: flex; flex: 1; padding-left: 20px; }
+        .nav-menu li {
+            padding: 0 28px; color: #fff; font-size: 15px;
+            cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .nav-menu li:hover { color: #c9a96e; }
+        .nav-menu li.active::after {
+            content: ''; position: absolute; bottom: 0; left: 20%;
+            width: 60%; height: 3px; background: #c9a96e;
+        }
+
+        /* ============================================================
+           【MAIN-0】主体内容外层容器
+           ============================================================ */
+        .main-container {
+            width: 1200px; margin: 20px auto;
+            display: flex; gap: 16px;
+        }
+
+        /* ============================================================
+           【LEFT-1】左侧边栏区域
+           宽度：220px
+           接口：[25] GET /api/mall/category/list
+                  [10] GET /api/market/price/latest
+           ============================================================ */
+        .sidebar-left {
+            width: 220px; display: flex; flex-direction: column; gap: 16px;
+        }
+        .sidebar-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        .sidebar-card-header {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff; font-size: 15px; font-weight: 600;
+        }
+        .category-list { padding: 8px 0; }
+        .category-item {
+            padding: 12px 16px; cursor: pointer;
+            transition: all 0.3s; border-left: 3px solid transparent;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; color: #333;
+        }
+        .category-item:hover, .category-item.active {
+            background: #fff8e6; border-left-color: #c9a96e; color: #c9a96e;
+        }
+        .category-item .cat-icon { font-size: 18px; width: 24px; text-align: center; }
+        .price-list { padding: 12px 16px; }
+        .price-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .price-item:last-child { border-bottom: none; }
+        .price-item .metal-name { font-size: 14px; font-weight: 600; color: #333; }
+        .price-item .metal-name span { font-size: 12px; color: #999; font-weight: 400; margin-left: 4px; }
+        .price-item .metal-price { font-size: 16px; font-weight: 700; }
+        .price-item .metal-change { font-size: 12px; margin-top: 2px; text-align: right; }
+        .up { color: #ff4d4f; }
+        .down { color: #52c41a; }
+
+        /* ============================================================
+           【CENTER-1】中间主内容区域
+           宽度：自适应
+           ============================================================ */
+        .main-content { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+        /* ============================================================
+           【CENTER-1-A】Banner轮播区域
+           接口：[22] GET /api/mall/activity/ongoing
+           ============================================================ */
+        .banner-section {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+            position: relative; height: 280px;
+        }
+        .banner-window { position: relative; height: 100%; overflow: hidden; }
+        .banner-track { display: flex; transition: transform 0.5s ease; height: 100%; }
+        .banner-slide {
+            min-width: 100%; height: 100%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; cursor: pointer;
+        }
+        .banner-slide .banner-text {
+            position: absolute; left: 40px; bottom: 40px;
+            color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .banner-slide .banner-text h3 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .banner-slide .banner-text p { font-size: 16px; opacity: 0.9; }
+        .banner-slide .banner-text .banner-btn {
+            display: inline-block; margin-top: 16px; padding: 10px 28px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; border-radius: 6px; font-size: 14px; font-weight: 600;
+        }
+        .banner-indicators {
+            position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 8px;
+        }
+        .banner-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.3s; }
+        .banner-dot.active { background: #c9a96e; width: 24px; border-radius: 4px; }
+        .banner-btn-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.9); border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #666; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .banner-btn-arrow:hover { background: #fff; color: #c9a96e; }
+        .banner-btn-arrow.prev { left: 16px; }
+        .banner-btn-arrow.next { right: 16px; }
+
+        /* ============================================================
+           【CENTER-1-B】筛选栏区域
+           ============================================================ */
+        .filter-section {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 16px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .filter-metal { display: flex; gap: 8px; }
+        .filter-metal span {
+            padding: 6px 16px; border-radius: 20px; font-size: 13px;
+            cursor: pointer; transition: all 0.3s; border: 1px solid #e0e0e0;
+        }
+        .filter-metal span:hover { border-color: #c9a96e; color: #c9a96e; }
+        .filter-metal span.active {
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; border-color: transparent;
+        }
+        .filter-sort { display: flex; gap: 16px; align-items: center; }
+        .filter-sort span { font-size: 13px; color: #666; cursor: pointer; transition: color 0.3s; }
+        .filter-sort span:hover { color: #c9a96e; }
+        .filter-sort span.active { color: #c9a96e; font-weight: 600; }
+        .filter-result { font-size: 13px; color: #999; }
+        .filter-result strong { color: #c9a96e; }
+
+        /* ============================================================
+           【CENTER-1-C】商品网格区域
+           接口：[19] GET /api/mall/goods/list
+                  [24] GET /api/mall/search
+           ============================================================ */
+        .goods-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+        }
+        .goods-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+            cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .goods-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        .goods-image {
+            width: 100%; height: 200px; background: #f8f9fa;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .goods-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .goods-card:hover .goods-image img { transform: scale(1.05); }
+        .goods-tag {
+            position: absolute; top: 12px; left: 12px;
+            padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;
+        }
+        .goods-tag.activity {
+            background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%); color: #fff;
+        }
+        .goods-tag.hot {
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%); color: #fff;
+        }
+        .goods-tag.new {
+            background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); color: #fff;
+        }
+        .goods-info { padding: 14px 16px; }
+        .goods-category {
+            font-size: 12px; color: #c9a96e; font-weight: 600; margin-bottom: 6px;
+        }
+        .goods-name { font-size: 15px; font-weight: 600; color: #333; line-height: 1.4; margin-bottom: 8px; }
+        .goods-spec { font-size: 12px; color: #999; margin-bottom: 10px; }
+        .goods-price-row {
+            display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px;
+        }
+        .goods-price {
+            font-size: 22px; font-weight: 700; color: #ff4d4f;
+        }
+        .goods-price .unit { font-size: 13px; font-weight: 400; }
+        .goods-original {
+            font-size: 13px; color: #999; text-decoration: line-through;
+        }
+        .goods-price-per { font-size: 12px; color: #999; }
+        .goods-store {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #999; padding-top: 10px;
+            border-top: 1px solid #f5f5f5;
+        }
+        .goods-store .store-name { color: #666; }
+        .goods-store .store-rating { color: #c9a96e; }
+
+        /* ============================================================
+           【CENTER-1-D】分页区域
+           ============================================================ */
+        .pagination {
+            display: flex; justify-content: center; align-items: center;
+            gap: 8px; padding: 20px 0;
+        }
+        .pagination button {
+            padding: 8px 16px; border: 1px solid #e0e0e0; background: #fff;
+            border-radius: 6px; font-size: 13px; color: #666; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .pagination button:hover:not(:disabled) { border-color: #c9a96e; color: #c9a96e; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination button.active {
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; border-color: transparent;
+        }
+        .pagination .page-jump {
+            display: flex; align-items: center; gap: 8px; margin-left: 16px;
+            font-size: 13px; color: #666;
+        }
+        .page-jump input {
+            width: 50px; padding: 6px; border: 1px solid #e0e0e0;
+            border-radius: 4px; text-align: center; font-size: 13px;
+        }
+
+        /* ============================================================
+           【RIGHT-1】右侧边栏区域
+           宽度：280px
+           ============================================================ */
+        .sidebar-right {
+            width: 280px; display: flex;
+            flex-direction: column; gap: 16px;
+        }
+        .info-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        .info-card-header {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-size: 15px; font-weight: 600; color: #333;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .info-card-header a { font-size: 13px; color: #c9a96e; }
+        .info-card-body { padding: 12px 16px; }
+
+        /* ============================================================
+           【RIGHT-1-A】购物车快捷区域
+           ============================================================ */
+        .cart-summary {
+            padding: 16px; text-align: center;
+        }
+        .cart-icon {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: linear-gradient(135deg, #fff8e6 0%, #ffe7ba 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; margin: 0 auto 12px;
+        }
+        .cart-count { font-size: 14px; color: #666; }
+        .cart-count strong { color: #c9a96e; font-size: 18px; }
+        .cart-total {
+            margin-top: 8px; font-size: 20px; font-weight: 700; color: #ff4d4f;
+        }
+        .cart-btn {
+            width: 100%; margin-top: 12px; padding: 12px 0;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; border: none; border-radius: 8px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .cart-btn:hover { opacity: 0.9; }
+
+        /* ============================================================
+           【RIGHT-1-B】热门活动区域
+           接口：[22] GET /api/mall/activity/ongoing
+           ============================================================ */
+        .activity-list { padding: 8px 0; }
+        .activity-item {
+            padding: 12px 16px; border-bottom: 1px solid #f5f5f5;
+            cursor: pointer; transition: background 0.3s;
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-item:hover { background: #fafafa; }
+        .activity-item-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 6px;
+        }
+        .activity-item-name { font-size: 14px; font-weight: 600; color: #333; }
+        .activity-item-badge {
+            font-size: 11px; padding: 2px 8px; border-radius: 10px;
+            background: #fff2f0; color: #cf1322;
+        }
+        .activity-item-badge.ongoing { background: #f6ffed; color: #389e0d; }
+        .activity-item-badge.upcoming { background: #e6f7ff; color: #096dd9; }
+        .activity-item-goods { font-size: 12px; color: #666; }
+        .activity-item-time { font-size: 11px; color: #999; margin-top: 4px; }
+
+        /* ============================================================
+           【RIGHT-1-C】猜你喜欢区域
+           ============================================================ */
+        .recommend-list { padding: 8px 0; }
+        .recommend-item {
+            display: flex; gap: 12px; padding: 10px 16px;
+            border-bottom: 1px solid #f5f5f5; cursor: pointer;
+            transition: background 0.3s;
+        }
+        .recommend-item:last-child { border-bottom: none; }
+        .recommend-item:hover { background: #fafafa; }
+        .recommend-img {
+            width: 60px; height: 60px; border-radius: 8px;
+            background: #f8f9fa; flex-shrink: 0; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+        }
+        .recommend-info { flex: 1; min-width: 0; }
+        .recommend-name {
+            font-size: 13px; color: #333; line-height: 1.4;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .recommend-price { font-size: 14px; font-weight: 700; color: #ff4d4f; margin-top: 4px; }
+
+        /* ============================================================
+           【BOTTOM-1】底部三栏区域
+           ============================================================ */
+        .bottom-section {
+            width: 1200px; margin: 20px auto 40px;
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+        }
+        .bottom-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        .bottom-card-header {
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .bottom-card-header h3 { font-size: 16px; font-weight: 600; }
+        .bottom-card-header .icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .bottom-card-body { padding: 16px 20px; }
+        .service-item {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 10px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .service-item:last-child { border-bottom: none; }
+        .service-icon {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #fff8e6; color: #c9a96e;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .service-title { font-size: 14px; font-weight: 600; color: #333; }
+        .service-desc { font-size: 12px; color: #999; margin-top: 2px; }
+
+        /* ============================================================
+           【FOOTER-1】页脚区域
+           ============================================================ */
+        .footer {
+            background: #1a1a2e; color: #fff;
+            padding: 40px 0 20px; margin-top: 40px;
+        }
+        .footer-content {
+            width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+        }
+        .footer-brand h3 { font-size: 20px; margin-bottom: 12px; }
+        .footer-brand p { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.8; }
+        .footer-links h4 { font-size: 15px; margin-bottom: 16px; color: #c9a96e; }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a { font-size: 13px; color: rgba(255,255,255,0.6); transition: color 0.3s; }
+        .footer-links a:hover { color: #c9a96e; }
+        .footer-bottom {
+            width: 1200px; margin: 30px auto 0; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center; font-size: 12px; color: rgba(255,255,255,0.4);
+        }
+
+        /* ============================================================
+           【MODAL-1】商品详情弹窗区域
+           接口：[20] GET /api/mall/goods/{id}
+                  [21] GET /api/mall/goods/buy-info/{specId}
+           ============================================================ */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-container {
+            background: #fff; border-radius: 16px; width: 800px; max-width: 90%;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            padding: 16px 24px; border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; background: #fff; z-index: 10;
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 700; }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%; border: none;
+            background: #f5f5f5; cursor: pointer; font-size: 16px; color: #999;
+        }
+        .modal-close:hover { background: #e0e0e0; color: #333; }
+        .modal-body { padding: 24px; display: flex; gap: 24px; }
+        .modal-image {
+            width: 320px; height: 320px; border-radius: 12px;
+            background: #f8f9fa; flex-shrink: 0; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 120px;
+        }
+        .modal-info { flex: 1; }
+        .modal-category { font-size: 12px; color: #c9a96e; font-weight: 600; margin-bottom: 6px; }
+        .modal-name { font-size: 20px; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .modal-desc { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 16px; }
+        .modal-price-row {
+            display: flex; align-items: baseline; gap: 12px;
+            padding: 12px 16px; background: #fff8e6; border-radius: 8px; margin-bottom: 16px;
+        }
+        .modal-price { font-size: 28px; font-weight: 700; color: #ff4d4f; }
+        .modal-original { font-size: 14px; color: #999; text-decoration: line-through; }
+        .modal-price-per { font-size: 13px; color: #666; }
+        .spec-section { margin-bottom: 16px; }
+        .spec-label { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .spec-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .spec-option {
+            padding: 8px 16px; border: 1px solid #e0e0e0; border-radius: 6px;
+            font-size: 13px; cursor: pointer; transition: all 0.3s;
+        }
+        .spec-option:hover { border-color: #c9a96e; color: #c9a96e; }
+        .spec-option.active {
+            border-color: #c9a96e; background: #fff8e6; color: #c9a96e; font-weight: 600;
+        }
+        .spec-option.disabled { opacity: 0.5; cursor: not-allowed; }
+        .quantity-section { margin-bottom: 16px; }
+        .quantity-wrap {
+            display: flex; align-items: center; gap: 0;
+            border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; width: fit-content;
+        }
+        .quantity-wrap button {
+            width: 36px; height: 36px; border: none; background: #f5f5f5;
+            font-size: 16px; cursor: pointer;
+        }
+        .quantity-wrap input {
+            width: 50px; height: 36px; border: none; text-align: center;
+            font-size: 14px; font-weight: 600;
+        }
+        .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-btn {
+            flex: 1; padding: 14px 0; border-radius: 8px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            border: none; transition: all 0.3s; text-align: center;
+        }
+        .modal-btn.cart { background: #fff8e6; color: #c9a96e; border: 1px solid #c9a96e; }
+        .modal-btn.cart:hover { background: #fff0d6; }
+        .modal-btn.buy {
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff;
+        }
+        .modal-btn.buy:hover { opacity: 0.9; }
+        .modal-store {
+            margin-top: 16px; padding: 12px; background: #f8f9fa;
+            border-radius: 8px; font-size: 13px; color: #666;
+        }
+        .modal-store strong { color: #333; }
+
+        /* ============================================================
+           【TOAST-1】消息提示区域
+           ============================================================ */
+        .toast {
+            position: fixed; top: 60px; right: 30px;
+            padding: 14px 24px; border-radius: 8px; color: #fff;
+            font-size: 14px; font-weight: 600; z-index: 3000;
+            transform: translateX(150%); transition: transform 0.4s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); }
+        .toast.error { background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%); }
+
+        @media (max-width: 1200px) {
+            body::before {
+                content: '请使用 1200px 以上宽度浏览以获得最佳体验';
+                position: fixed; top: 0; left: 0; right: 0;
+                background: #c9a96e; color: #fff;
+                text-align: center; padding: 8px; z-index: 9999; font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==========================================================
+         【TOP-1】顶部跑马灯行情区域 START
+         接口：[10] GET /api/market/price/latest
+         ========================================================== -->
+    <div class="ticker-bar">
+        <div class="ticker-content" id="tickerContent">
+            <div class="ticker-item">
+                <span class="name">黄金 AU</span>
+                <span class="price" id="tickerAuPrice">¥723.15</span>
+                <span class="change-up" id="tickerAuChange">▲ +1.25 +0.25%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">白银 AG</span>
+                <span class="price" id="tickerAgPrice">¥6.85</span>
+                <span class="change-up" id="tickerAgChange">▲ +0.03 +0.46%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">铂金 PT</span>
+                <span class="price" id="tickerPtPrice">¥228.50</span>
+                <span class="change-down" id="tickerPtChange">▼ -1.20 -0.52%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">黄金 AU</span>
+                <span class="price">¥723.15</span>
+                <span class="change-up">▲ +1.25 +0.25%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">白银 AG</span>
+                <span class="price">¥6.85</span>
+                <span class="change-up">▲ +0.03 +0.46%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">铂金 PT</span>
+                <span class="price">¥228.50</span>
+                <span class="change-down">▼ -1.20 -0.52%</span>
+            </div>
+        </div>
+    </div>
+    <!-- 【TOP-1】顶部跑马灯行情区域 END -->
+
+    <!-- ==========================================================
+         【HEADER-1】头部导航区域 START
+         ========================================================== -->
+    <header class="header">
+        <div class="header-top">
+            <div class="logo-area">
+                <div class="logo-icon">🏆</div>
+                <div class="logo-text">
+                    <h1>GoldSim 模拟投资</h1>
+                    <p>虚拟资金 · 真实行情 · 零风险练手</p>
+                </div>
+            </div>
+            <div class="search-area">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索商品、金条、首饰、金币...">
+                    <button onclick="doSearch()">搜索</button>
+                </div>
+            </div>
+            <div class="user-area">
+                <a href="#">帮助中心</a>
+                <a href="#">下载APP</a>
+                <a href="#" class="btn-login">登录 / 注册</a>
+            </div>
+        </div>
+        <nav class="nav-bar">
+            <div class="nav-content">
+                <div class="nav-category">📋 品种分类</div>
+                <ul class="nav-menu">
+                    <li>行情中心</li>
+                    <li>模拟交易</li>
+                    <li>排行榜</li>
+                    <li class="active">实物商城</li>
+                    <li>门店服务</li>
+                    <li>资讯动态</li>
+                    <li>个人中心</li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <!-- 【HEADER-1】头部导航区域 END -->
+
+    <!-- ==========================================================
+         【MAIN-0】主体内容外层容器 START
+         ========================================================== -->
+    <div class="main-container">
+
+        <!-- ==========================================================
+             【LEFT-1】左侧边栏区域 START
+             宽度：220px
+             接口：[25] GET /api/mall/category/list
+                    [10] GET /api/market/price/latest
+             ========================================================== -->
+        <aside class="sidebar-left">
+            <!-- 【LEFT-1-A/B】商品分类 START -->
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">📂 商品分类</div>
+                <div class="category-list" id="categoryList">
+                    <div class="category-item active" data-category="" onclick="filterCategory('')">
+                        <span class="cat-icon">🏆</span>全部商品
+                    </div>
+                    <div class="category-item" data-category="投资金条" onclick="filterCategory('投资金条')">
+                        <span class="cat-icon">🟨</span>投资金条
+                    </div>
+                    <div class="category-item" data-category="首饰" onclick="filterCategory('首饰')">
+                        <span class="cat-icon">💍</span>黄金首饰
+                    </div>
+                    <div class="category-item" data-category="金币" onclick="filterCategory('金币')">
+                        <span class="cat-icon">🪙</span>纪念金币
+                    </div>
+                    <div class="category-item" data-category="摆件" onclick="filterCategory('摆件')">
+                        <span class="cat-icon">🗿</span>工艺摆件
+                    </div>
+                </div>
+            </div>
+            <!-- 【LEFT-1-A/B】商品分类 END -->
+
+            <!-- 【LEFT-1-C】实时金价卡片 START -->
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">📈 实时金价</div>
+                <div class="price-list" id="priceList">
+                    <div class="price-item">
+                        <div>
+                            <div class="metal-name">黄金 <span>AU</span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="metal-price up" id="sideAuPrice">¥723.15</div>
+                            <div class="metal-change up" id="sideAuChange">+0.25%</div>
+                        </div>
+                    </div>
+                    <div class="price-item">
+                        <div>
+                            <div class="metal-name">白银 <span>AG</span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="metal-price up" id="sideAgPrice">¥6.85</div>
+                            <div class="metal-change up" id="sideAgChange">+0.46%</div>
+                        </div>
+                    </div>
+                    <div class="price-item">
+                        <div>
+                            <div class="metal-name">铂金 <span>PT</span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="metal-price down" id="sidePtPrice">¥228.50</div>
+                            <div class="metal-change down" id="sidePtChange">-0.52%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 【LEFT-1-C】实时金价卡片 END -->
+        </aside>
+        <!-- 【LEFT-1】左侧边栏区域 END -->
+
+        <!-- ==========================================================
+             【CENTER-1】中间主内容区域 START
+             宽度：自适应
+             ========================================================== -->
+        <main class="main-content">
+
+            <!-- ==========================================================
+                 【CENTER-1-A】Banner轮播区域 START
+                 接口：[22] GET /api/mall/activity/ongoing
+                 ========================================================== -->
+            <div class="banner-section">
+                <div class="banner-window">
+                    <button class="banner-btn-arrow prev" onclick="bannerPrev()">‹</button>
+                    <button class="banner-btn-arrow next" onclick="bannerNext()">›</button>
+                    <div class="banner-track" id="bannerTrack">
+                        <div class="banner-slide" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+                            <div class="banner-text">
+                                <h3>🎁 新用户首购专享</h3>
+                                <p>投资金条限时特惠，每克低至 ¥723，注册即享</p>
+                                <span class="banner-btn">立即抢购 ></span>
+                            </div>
+                        </div>
+                        <div class="banner-slide" style="background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);">
+                            <div class="banner-text">
+                                <h3>🏆 模拟交易大赛</h3>
+                                <p>周收益 Top10 赢取实物黄金大奖</p>
+                                <span class="banner-btn" style="background:#1a1a2e;">立即报名 ></span>
+                            </div>
+                        </div>
+                        <div class="banner-slide" style="background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);">
+                            <div class="banner-text">
+                                <h3>🎊 2026 纪念金币</h3>
+                                <p>限量发售，收藏投资两相宜</p>
+                                <span class="banner-btn" style="background:#1a1a2e;">查看详情 ></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="banner-indicators" id="bannerIndicators">
+                        <div class="banner-dot active" onclick="goToBanner(0)"></div>
+                        <div class="banner-dot" onclick="goToBanner(1)"></div>
+                        <div class="banner-dot" onclick="goToBanner(2)"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 【CENTER-1-A】Banner轮播区域 END -->
+
+            <!-- ==========================================================
+                 【CENTER-1-B】筛选栏区域 START
+                 ========================================================== -->
+            <div class="filter-section">
+                <div class="filter-metal" id="filterMetal">
+                    <span class="active" data-metal="" onclick="filterMetal('')">全部</span>
+                    <span data-metal="AU" onclick="filterMetal('AU')">🟨 黄金</span>
+                    <span data-metal="AG" onclick="filterMetal('AG')">⬜ 白银</span>
+                    <span data-metal="PT" onclick="filterMetal('PT')">🟪 铂金</span>
+                </div>
+                <div class="filter-sort">
+                    <span class="active" onclick="sortGoods('default')">综合排序</span>
+                    <span onclick="sortGoods('price_asc')">价格 ↑</span>
+                    <span onclick="sortGoods('price_desc')">价格 ↓</span>
+                    <span onclick="sortGoods('new')">最新上架</span>
+                </div>
+                <div class="filter-result">共 <strong id="totalCount">12</strong> 件商品</div>
+            </div>
+            <!-- 【CENTER-1-B】筛选栏区域 END -->
+
+            <!-- ==========================================================
+                 【CENTER-1-C】商品网格区域 START
+                 接口：[19] GET /api/mall/goods/list
+                        [24] GET /api/mall/search
+                 ========================================================== -->
+            <div class="goods-grid" id="goodsGrid">
+                <!-- 【CENTER-1-C-1-1】商品卡片1 -->
+                <div class="goods-card" onclick="openGoodsDetail(1)">
+                    <div class="goods-image">
+                        <div style="font-size:64px;">🟨</div>
+                        <div class="goods-tag activity">限时特惠</div>
+                    </div>
+                    <div class="goods-info">
+                        <div class="goods-category">投资金条 · 黄金 AU</div>
+                        <div class="goods-name">投资金条 10克 AU9999</div>
+                        <div class="goods-spec">纯度 99.99% · 支持回购</div>
+                        <div class="goods-price-row">
+                            <div class="goods-price">¥7,231<span class="unit">.50</span></div>
+                            <div class="goods-original">¥7,500.00</div>
+                        </div>
+                        <div class="goods-price-per">约 ¥723.15/克</div>
+                        <div class="goods-store">
+                            <span>📍</span>
+                            <span class="store-name">GoldSim 旗舰店</span>
+                            <span class="store-rating">★ 4.9</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【CENTER-1-C-1-2】商品卡片2 -->
+                <div class="goods-card" onclick="openGoodsDetail(2)">
+                    <div class="goods-image">
+                        <div style="font-size:64px;">🟨</div>
+                        <div class="goods-tag hot">热销</div>
+                    </div>
+                    <div class="goods-info">
+                        <div class="goods-category">投资金条 · 黄金 AU</div>
+                        <div class="goods-name">投资金条 20克 AU9999</div>
+                        <div class="goods-spec">纯度 99.99% · 支持回购</div>
+                        <div class="goods-price-row">
+                            <div class="goods-price">¥14,463<span class="unit">.00</span></div>
+                        </div>
+                        <div class="goods-price-per">约 ¥723.15/克</div>
+                        <div class="goods-store">
+                            <span>📍</span>
+                            <span class="store-name">GoldSim 旗舰店</span>
+                            <span class="store-rating">★ 4.9</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【CENTER-1-C-1-3】商品卡片3 -->
+                <div class="goods-card" onclick="openGoodsDetail(3)">
+                    <div class="goods-image">
+                        <div style="font-size:64px;">🟨</div>
+                    </div>
+                    <div class="goods-info">
+                        <div class="goods-category">投资金条 · 黄金 AU</div>
+                        <div class="goods-name">投资金条 50克 AU9999</div>
+                        <div class="goods-spec">纯度 99.99% · 支持回购 · 大额优惠</div>
+                        <div class="goods-price-row">
+                            <div class="goods-price">¥36,000<span class="unit">.00</span></div>
+                            <div class="goods-original">¥37,500.00</div>
+                        </div>
+                        <div class="goods-price-per">约 ¥720.00/克</div>
+                        <div class="goods-store">
+                            <span>📍</span>
+                            <span class="store-name">GoldSim 旗舰店</span>
+                            <span class="store-rating">★ 4.9</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【CENTER-1-C-1-4】商品卡片4 -->
+                <div class="goods-card" onclick="openGoodsDetail(4)">
+                    <div class="goods-image">
+                        <div style="font-size:64px;">💍</div>
+                        <div class="goods-tag new">新品</div>
+                    </div>
+                    <div class="goods-info">
+                        <div class="goods-category">首饰 · 黄金 AU</div>
+                        <div class="goods-name">足金项链 水波纹款 8克</div>
+                        <div class="goods-spec">工艺精湛 · 配证书 · 礼盒装</div>
+                        <div class="goods-price-row">
+                            <div class="goods-price">¥6,500<span class="unit">.00</span></div>
+                        </div>
+                        <div class="goods-price-per">含工费约 ¥812.50/克</div>
+                        <div class="goods-store">
+                            <span>📍</span>
+                            <span class="store-name">精品首饰店</span>
+                            <span class="store-rating">★ 4.8</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【CENTER-1-C-1-5】商品卡片5 -->
+                <div class="goods-card" onclick="openGoodsDetail(5)">
+                    <div class="goods-image">
+                        <div style="font-size:64px;">🪙</div>
+                        <div class="goods-tag activity">限量</div>
+                    </div>
+                    <div class="goods-info">
+                        <div class="goods-category">纪念金币 · 黄金 AU</div>
+                        <div class="goods-name">2026 纪念金币 限量发售</div>
+                        <div class="goods-spec">5克 · 999纯金 · 收藏证书</div>
+                        <div class="goods-price-row">
+                            <div class="goods-price">¥3,680<span class="unit">.00</span></div>
+                            <div class="goods-original">¥3,980.00</div>
+                        </div>
+                        <div class="goods-price-per">约 ¥736.00/克</div>
+                        <div class="goods-store">
+                            <span>📍</span>
+                            <span class="store-name">GoldSim 旗舰店</span>
+                            <span class="store-rating">★ 4.9</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【CENTER-1-C-1-6】商品卡片6 -->
+                <div class="goods-card" onclick="openGoodsDetail(6)">
+                    <div class="goods-image">
+                        <div style="font-size:64px;">⬜</div>
+                    </div>
+                    <div class="goods-info">
+                        <div class="goods-category">投资银条 · 白银 AG</div>
+                        <div class="goods-name">投资银条 100克 AG999</div>
+                        <div class="goods-spec">纯度 99.9% · 工业投资两相宜</div>
+                        <div class="goods-price-row">
+                            <div class="goods-price">¥750<span class="unit">.00</span></div>
+                        </div>
+                        <div class="goods-price-per">约 ¥7.50/克</div>
+                        <div class="goods-store">
+                            <span>📍</span>
+                            <span class="store-name">白银专营店</span>
+                            <span class="store-rating">★ 4.7</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【CENTER-1-C-1-7】商品卡片7 -->
+                <div class="goods-card" onclick="openGoodsDetail(7)">
+                    <div class="goods-image">
+                        <div style="font-size:64px;">🟪</div>
+                    </div>
+                    <div class="goods-info">
+                        <div class="goods-category">首饰 · 铂金 PT</div>
+                        <div class="goods-name">铂金对戒 PT950 5克/只</div>
+                        <div class="goods-spec">永不褪色 · 情侣对戒 · 刻字服务</div>
+                        <div class="goods-price-row">
+                            <div class="goods-price">¥2,400<span class="unit">.00</span></div>
+                        </div>
+                        <div class="goods-price-per">约 ¥480.00/克</div>
+                        <div class="goods-store">
+                            <span>📍</span>
+                            <span class="store-name">铂金工坊</span>
+                            <span class="store-rating">★ 4.8</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【CENTER-1-C-1-8】商品卡片8 -->
+                <div class="goods-card" onclick="openGoodsDetail(8)">
+                    <div class="goods-image">
+                        <div style="font-size:64px;">💍</div>
+                        <div class="goods-tag hot">热销</div>
+                    </div>
+                    <div class="goods-info">
+                        <div class="goods-category">首饰 · 黄金 AU</div>
+                        <div class="goods-name">古法黄金手镯 30克</div>
+                        <div class="goods-spec">传承工艺 · 哑光质感 · 配证书</div>
+                        <div class="goods-price-row">
+                            <div class="goods-price">¥22,500<span class="unit">.00</span></div>
+                        </div>
+                        <div class="goods-price-per">含工费约 ¥750.
+
+
+
+
+
+
+
+
+
+
+GoldSim 实物商城 — 位置与接口对应表
+表格
+位置编号	区域名称	功能说明	对应接口路径	接口编号	请求方式	认证要求
+TOP-1	顶部跑马灯行情	显示 AU/AG/PT 实时价格滚动	GET /api/market/price/latest?metalType={AU/AG/PT}	[10]	GET	无需认证
+HEADER-1-A-2	搜索框	商品关键词搜索	GET /api/mall/search?keyword={关键词}&category={分类}&metalType={品种}&page=1&size=10	[24]	GET	无需认证
+LEFT-1-B	左侧商品分类	展示商品分类列表（投资金条/首饰/金币/摆件）	GET /api/mall/category/list	[25]	GET	无需认证
+LEFT-1-C	左侧实时金价	展示 AU/AG/PT 最新价格及涨跌幅	GET /api/market/price/latest?metalType={AU/AG/PT}	[10]	GET	无需认证
+CENTER-1-A	Banner轮播	展示进行中的活动/促销大图	GET /api/mall/activity/ongoing?page=1&size=3	[22]	GET	需要认证
+CENTER-1-B	筛选栏-金属筛选	按金属品种筛选商品（AU/AG/PT）	前端本地筛选，配合商品列表接口参数	—	—	—
+CENTER-1-B	筛选栏-排序	综合排序/价格升序/价格降序/最新上架	前端本地排序，配合商品列表接口参数	—	—	—
+CENTER-1-C	商品网格列表	展示商品卡片（名称、价格、规格、门店）	GET /api/mall/goods/list?page={页码}&size={每页条数}&category={分类}&metalType={品种}	[19]	GET	无需认证
+CENTER-1-D	分页导航	商品列表分页切换	配合 [19] 接口，传递 page/size 参数	[19]	GET	无需认证
+RIGHT-1-A	购物车快捷	显示购物车商品数量和总价	本地购物车数据（暂存 localStorage）	—	—	—
+RIGHT-1-A	购物车-去结算	跳转到购物车/结算页	跳转至订单确认页	—	—	需要认证
+RIGHT-1-B	热门活动列表	展示进行中的活动（名称、商品、时间）	GET /api/mall/activity/ongoing?page=1&size=5	[22]	GET	需要认证
+RIGHT-1-C	猜你喜欢	推荐商品列表（基于浏览/购买历史）	GET /api/mall/goods/list?page=1&size=3（按排序权重取推荐）	[19]	GET	无需认证
+BOTTOM-1-A/B/C	底部服务信息	服务保障/配送说明/售后政策（静态内容）	无需接口	—	—	—
+商品详情弹窗（MODAL-1）接口对应
+表格
+位置编号	区域名称	功能说明	对应接口路径	接口编号	请求方式	认证要求
+MODAL-1-C/D	商品图+基本信息	展示商品详情（名称、分类、描述、门店）	GET /api/mall/goods/{goodsId}	[20]	GET	无需认证
+MODAL-1-E	规格选择	展示商品所有规格（克重、工费、库存）	GET /api/mall/goods/{goodsId} 返回的 specList	[20]	GET	无需认证
+MODAL-1-E	购买价格计算	选择规格和数量后计算实时总价	GET /api/mall/goods/buy-info/{specId}?quantity={数量}	[21]	GET	需要认证
+MODAL-1-F	加入购物车	将选中规格加入购物车	本地存储 / 后续可扩展购物车接口	—	—	—
+MODAL-1-F	立即购买	跳转确认订单页，生成订单	POST /api/order/create/{userId}	[58]	POST	需要认证
+接口调用时机说明
+表格
+触发时机	调用接口	说明
+页面初始化	[10] + [19] + [25]	加载金价、商品列表、分类
+切换商品分类（左侧）	[19]	带 category 参数重新请求商品列表
+点击金属筛选标签	[19]	带 metalType 参数重新请求商品列表
+切换排序方式	前端本地排序 / [19]	若后端支持排序则传参，否则前端排序
+输入关键词搜索	[24]	调用搜索接口，替换商品网格内容
+点击商品卡片	[20]	打开弹窗，请求商品详情
+弹窗内切换规格	[21]	重新计算实时总价
+点击"立即购买"	[58]	创建订单，跳转支付
+点击"去结算"	—	跳转购物车/订单列表页
+关键设计决策
+LEFT-1-B 分类列表 使用 [25] GET /api/mall/category/list 而非硬编码，支持后端动态扩展分类。
+CENTER-1-A Banner 使用 [22] 活动列表 接口取前3条进行中活动，避免静态写死。
+CENTER-1-C 商品网格 默认调用 [19]，搜索时切换到 [24]，两者返回结构一致（GoodsListVO），前端可共用渲染逻辑。
+RIGHT-1-A 购物车 当前设计为本地存储（未登录也能加购），结算时再要求登录并调用订单接口。
+MODAL-1 弹窗 采用"先查详情 [20]，再算价格 [21]"的两步策略，确保实时金价准确。
+所有"需要认证"的接口 在调用前需检查 localStorage 中的 token，未登录时引导至登录页。

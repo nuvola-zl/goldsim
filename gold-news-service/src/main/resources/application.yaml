@@ -1,0 +1,33 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: gold-news-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/goldsim?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  elasticsearch:
+    uris: http://192.168.153.129:9200
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.153.129:8848
+      config:
+        # TODO [配置管理] gold-news-service 是唯一禁用 Nacos 配置中心的服务。这导致新闻同步 cron 表达式、API 密钥等配置硬编码在本地，无法动态刷新。应启用 Nacos config 并添加 spring.config.import
+        enabled: false
+        import-check:
+          enabled: false
+
+juhe:
+  api:
+    key: 94868b1c12d173422b60a26670f08207
+    url: https://apis.juhe.cn/fapigx/caijing/query
+  ai:
+    key: eef7ee95c1a80a77fed6a6076f10d39c
+
+sync:
+  cron: "0 0 9,15 * * ?"
+
+##todo默认分词器为 standard,修改为ik

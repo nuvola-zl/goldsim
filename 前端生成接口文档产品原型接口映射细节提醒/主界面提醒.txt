@@ -1,0 +1,152 @@
+二、具体修改建议（按位置）（首页）
+【LEFT-1-B】左侧品种列表 — 接入持仓接口
+当前：
+HTML
+<div class="sym-price up" id="symPriceAU">¥723.15</div>
+<div class="sym-change up" id="symChangeAU">▲ +1.25 +0.25%</div>
+建议增加： 在 sym-change 下方加一行持仓显示
+HTML
+<!-- 新增：持仓快捷显示 -->
+<div class="sym-hold" id="symHoldAU" style="font-size:12px;color:#999;margin-top:4px;">
+    持仓: <span style="color:#c9a96e;font-weight:600;">0.0000克</span>
+</div>
+接口： [20] GET /api/simulation/position/{metalType}
+时机： 切换品种时调用，初始化时遍历三个品种都查一次
+【CENTER-1-C】新闻轮播 — 接入 AI 简报接口
+当前： 6条静态假新闻
+建议： 用 [39] GET /news/ai-brief 替换，或者两者结合（AI简报放轮播，普通新闻放底部）
+接口： [39] GET /api/news/ai-brief
+返回格式：
+JSON
+{
+  "date": "2026-07-09",
+  "items": [
+    { "title": "...", "summary": "...", "source": "...", "category": "...", "url": "..." }
+  ]
+}
+注意： AI简报只有 summary 没有完整正文，适合做轮播卡片展示。点击后跳外链（url字段）。
+【CENTER-1-E】最近交易记录 — 接入真实交易历史
+当前： 5条静态假数据
+建议： 页面初始化时调用 [23] GET /simulation/trade/history?page=1&size=5
+代码里其实已经写了：
+JavaScript
+// 4.3 加载最近交易记录
+const history = await fetchTradeHistory(1, 5);
+if (history && history.list) {
+    renderTradeRecords(history.list);
+}
+问题： 你的 fetchTradeHistory 函数返回的是 PageResult，但 renderTradeRecords 接收的是 records 数组。需要确认 history.list 还是 history.records 还是 history.data？
+根据你的 PageResult 定义：
+java
+@Data
+@Builder
+public class PageResult<T> {
+    private List<T> list;  // ← 应该是 list
+    private Long total;
+    private Integer page;
+    private Integer size;
+    private Integer pages;
+}
+所以 history.list 是对的。但你的代码里：
+JavaScript
+const history = await fetchTradeHistory(1, 5);
+if (history && history.list) {  // ← 这里
+    renderTradeRecords(history.list);
+}
+fetchTradeHistory 返回的是 apiRequest 的结果，也就是 data 字段的内容。如果后端返回：
+JSON
+{
+  "code": "A00000",
+  "data": {
+    "list": [...],
+    "total": 100,
+    "page": 1,
+    "size": 5,
+    "pages": 20
+  }
+}
+那 history 就是 data 对象，history.list 是对的。
+【RIGHT-1-A】模拟资产概览 — 确认是否已调用
+代码里已写：
+JavaScript
+// 4.1 加载资产总览
+const overview = await fetchAccountOverview();
+但问题是： 如果 API 返回失败（比如未登录），会走 Mock 分支显示 ¥100,000。这没问题。
+建议增加： 加一个"刷新"按钮，让用户手动刷新资产
+HTML
+<!-- 在 info-card-header 的 "详情 >" 旁边加 -->
+<a href="#" onclick="refreshAssets()">刷新</a>
+JavaScript
+async function refreshAssets() {
+    await fetchAccountOverview();
+    await fetchPositionList();
+    showToast('资产已刷新', 'success');
+}
+【RIGHT-1-B】排行榜 — 确认是否已调用
+代码里已写：
+JavaScript
+// 4.4 加载排行榜
+await fetchLeaderboard();
+但 renderLeaderboard 可能有问题： 你的 Mock 数据里有 rank 字段，但 API 返回的 LeaderboardVO 也有 rank。需要确认字段名是否一致。
+LeaderboardVO 字段：
+java
+private int rank;
+private Long userId;
+private String nickname;
+private BigDecimal totalProfit;
+你的 renderLeaderboard：
+JavaScript
+return `
+    <div class="rank-item">
+        <div class="rank-num ${rankClass}">${item.rank || (index + 1)}</div>
+        ...
+        <div class="rank-profit">+¥${formatMoney(item.totalProfit)}</div>
+    </div>
+`;
+这里 item.rank 应该是 item.rank，但你的 API 返回的是 LeaderboardVO，字段名是 rank（小写）。Java 的 rank 序列化到 JSON 也是 rank，所以没问题。
+【RIGHT-1-C】我的排名 — 确认是否已调用
+代码里已写：
+JavaScript
+// 4.5 加载我的排名
+await fetchMyRank();
+问题： renderMyRank 里用了 data.onList，但你的 UserRankVO 字段是：
+java
+private Long rank;
+private BigDecimal totalProfit;
+private Boolean onList;
+所以 data.onList 是对的。
+【BOTTOM-1-A】市场动态 — 接入真实新闻列表
+当前： 5条静态假新闻
+建议： 用 [30] GET /news/list?page=1&size=5 替换
+新增接口调用：
+JavaScript
+async function fetchNewsList(page = 1, size = 5) {
+    const data = await apiRequest(`/news/list?page=${page}&size=${size}`);
+    return data;
+}
+渲染函数：
+JavaScript
+function renderNewsList(newsData) {
+    const container = document.querySelector('.bottom-card-body'); // 市场动态那个
+    // 找到市场动态的那个卡片，替换内容
+}
+注意： 底部有三个卡片（市场动态、交易指南、热门活动），需要准确定位到市场动态那个。
+【BOTTOM-1-C】热门活动 — 接入真实活动列表
+当前： 3条静态假活动
+建议： 用 [22] GET /mall/activity/ongoing?page=1&size=3 替换
+新增接口调用：
+JavaScript
+async function fetchOngoingActivities(page = 1, size = 3) {
+    const data = await apiRequest(`/mall/activity/ongoing?page=${page}&size=${size}`);
+    return data;
+}
+三、总结：首页需要修改的地方
+表格
+位置	修改内容	接口	优先级
+左侧品种列表	每个品种下方显示持仓量	position/{metalType}	⭐⭐⭐
+新闻轮播	替换为AI简报或真实新闻	 ai-brief /  news/list	⭐⭐⭐
+最近交易记录	确认已调用，修复可能的字段问题	 trade/history	⭐⭐⭐（已做，需验证）
+模拟资产	加刷新按钮	 account/overview	⭐⭐
+市场动态（底部）	替换为真实新闻	 news/list	⭐⭐⭐
+热门活动（底部）	替换为真实活动	 activity/ongoing	⭐⭐⭐
+排行榜/我的排名	确认字段映射正确	 top20 /  my-rank	⭐⭐（已做，需验证）

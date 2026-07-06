@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gold.product.mapper.GoodsAdminMapper">
+
+    <select id="selectGoodsAdminPage" resultType="com.gold.mallApi.domain.vo.GoodsAdminListVO">
+        SELECT
+        g.id as goods_id,
+        g.goods_name,
+        g.category,
+        g.metal_type,
+        g.store_id,
+        g.sort,
+        g.create_time,
+        (SELECT COUNT(*) FROM mall_goods_spec s WHERE s.goods_id = g.id) as spec_count,
+        (SELECT COALESCE(SUM(s.stock), 0) FROM mall_goods_spec s WHERE s.goods_id = g.id) as total_stock
+        FROM mall_goods g
+        <where>
+            <if test="dto.category != null and dto.category != ''">
+                AND g.category = #{dto.category}
+            </if>
+            <if test="dto.metalType != null and dto.metalType != ''">
+                AND g.metal_type = #{dto.metalType}
+            </if>
+        </where>
+        ORDER BY g.sort ASC, g.create_time DESC
+    </select>
+
+</mapper>

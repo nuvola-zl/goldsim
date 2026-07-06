@@ -1,0 +1,2042 @@
+
+# 继续生成HTML文件的后半部分
+html_part2 = '''                            <button class="store-action-btn secondary" onclick="event.stopPropagation();openMapNavigate(4)">导航到店</button>
+                        </div>
+                    </div>
+                    <!-- 【CENTER-2-B-2-5】门店卡片5 -->
+                    <div class="store-card" data-store-id="5" onclick="showStoreDetail(5)">
+                        <div class="store-card-cover">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#c9a96e33,#b8941d33);display:flex;align-items:center;justify-content:center;font-size:40px;">🏪</div>
+                            <span class="store-tag">旗舰店</span>
+                        </div>
+                        <div class="store-card-info">
+                            <div class="store-card-header">
+                                <div class="store-name">深圳南山旗舰店</div>
+                                <div class="store-rating">⭐ 4.8</div>
+                            </div>
+                            <div class="store-address">📍 深圳市南山区粤海街道科苑南路2666号中国华润大厦B1层</div>
+                            <div class="store-meta">
+                                <span>📞 0755-8888-3001</span>
+                                <span>🕐 09:30-21:30</span>
+                                <span>💬 134条评价</span>
+                            </div>
+                        </div>
+                        <div class="store-card-actions">
+                            <button class="store-action-btn primary" onclick="event.stopPropagation();showStoreDetail(5)">查看详情</button>
+                            <button class="store-action-btn secondary" onclick="event.stopPropagation();openMapNavigate(5)">导航到店</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 【CENTER-2-B-2】门店卡片列表 END -->
+
+                <!-- 【CENTER-2-B-3】分页器 START -->
+                <div class="pagination" id="storePagination">
+                    <button class="page-btn" disabled>‹</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <span class="page-info">共 3 页</span>
+                    <button class="page-btn">›</button>
+                </div>
+                <!-- 【CENTER-2-B-3】分页器 END -->
+            </div>
+            <!-- 【CENTER-2-B】门店列表区域 END -->
+
+        </main>
+        <!-- 【CENTER-2】中间主内容区域 END -->
+
+        <!-- ==========================================================
+             【RIGHT-2】右侧边栏区域 START
+             位置：主体右侧
+             功能：推荐门店、附近门店快捷入口、门店服务指南
+             宽度：280px
+             ========================================================== -->
+        <aside class="sidebar-right">
+
+            <!-- ==========================================================
+                 【RIGHT-2-A】推荐门店区域 START
+                 位置：右侧上部
+                 功能：展示评分最高的推荐门店
+                 子模块：RIGHT-2-A-1(推荐项)
+                 接口：[29] GET /api/store/recommend?city=&limit=10
+                 ========================================================== -->
+            <div class="info-card">
+                <!-- 【RIGHT-2-A-A】卡片标题栏 -->
+                <div class="info-card-header">
+                    <span>⭐ 推荐门店</span>
+                    <a href="#" onclick="loadRecommendStores()">刷新</a>
+                </div>
+                <!-- 【RIGHT-2-A-B】卡片内容区 START -->
+                <div class="recommend-list" id="recommendList">
+                    <!-- 【RIGHT-2-A-1-1】推荐1 -->
+                    <div class="recommend-item" onclick="showStoreDetail(1)">
+                        <div class="recommend-rank gold">1</div>
+                        <div class="recommend-info">
+                            <div class="recommend-name">北京朝阳旗舰店</div>
+                            <div class="recommend-addr">北京市朝阳区建国门外大街</div>
+                        </div>
+                        <div class="recommend-rating">⭐ 4.9</div>
+                    </div>
+                    <!-- 【RIGHT-2-A-1-2】推荐2 -->
+                    <div class="recommend-item" onclick="showStoreDetail(3)">
+                        <div class="recommend-rank silver">2</div>
+                        <div class="recommend-info">
+                            <div class="recommend-name">上海浦东旗舰店</div>
+                            <div class="recommend-addr">上海市浦东新区陆家嘴环路</div>
+                        </div>
+                        <div class="recommend-rating">⭐ 4.8</div>
+                    </div>
+                    <!-- 【RIGHT-2-A-1-3】推荐3 -->
+                    <div class="recommend-item" onclick="showStoreDetail(5)">
+                        <div class="recommend-rank bronze">3</div>
+                        <div class="recommend-info">
+                            <div class="recommend-name">深圳南山旗舰店</div>
+                            <div class="recommend-addr">深圳市南山区科苑南路</div>
+                        </div>
+                        <div class="recommend-rating">⭐ 4.8</div>
+                    </div>
+                    <!-- 【RIGHT-2-A-1-4】推荐4 -->
+                    <div class="recommend-item" onclick="showStoreDetail(2)">
+                        <div class="recommend-rank normal">4</div>
+                        <div class="recommend-info">
+                            <div class="recommend-name">北京海淀体验店</div>
+                            <div class="recommend-addr">北京市海淀区中关村大街</div>
+                        </div>
+                        <div class="recommend-rating">⭐ 4.7</div>
+                    </div>
+                    <!-- 【RIGHT-2-A-1-5】推荐5 -->
+                    <div class="recommend-item" onclick="showStoreDetail(4)">
+                        <div class="recommend-rank normal">5</div>
+                        <div class="recommend-info">
+                            <div class="recommend-name">上海静安体验店</div>
+                            <div class="recommend-addr">上海市静安区南京西路</div>
+                        </div>
+                        <div class="recommend-rating">⭐ 4.6</div>
+                    </div>
+                </div>
+                <!-- 【RIGHT-2-A-B】卡片内容区 END -->
+            </div>
+            <!-- 【RIGHT-2-A】推荐门店区域 END -->
+
+            <!-- ==========================================================
+                 【RIGHT-2-B】附近门店区域 START
+                 位置：右侧中部
+                 功能：基于当前定位展示附近门店
+                 子模块：RIGHT-2-B-1(附近项)
+                 接口：[26] GET /api/store/nearby?lng=&lat=&radius=5
+                 ========================================================== -->
+            <div class="info-card">
+                <!-- 【RIGHT-2-B-A】卡片标题栏 -->
+                <div class="info-card-header">
+                    <span>📍 附近门店</span>
+                    <a href="#" onclick="locateNearbyStores()">重新定位</a>
+                </div>
+                <!-- 【RIGHT-2-B-B】卡片内容区 START -->
+                <div class="info-card-body" id="nearbyList">
+                    <div style="text-align:center;padding:20px;color:#999;font-size:13px;">
+                        <div style="font-size:32px;margin-bottom:8px;">📍</div>
+                        <p>点击左侧"定位并查找附近门店"</p>
+                        <p style="font-size:12px;color:#bbb;margin-top:4px;">获取您附近的 GoldSim 门店</p>
+                    </div>
+                </div>
+                <!-- 【RIGHT-2-B-B】卡片内容区 END -->
+            </div>
+            <!-- 【RIGHT-2-B】附近门店区域 END -->
+
+            <!-- ==========================================================
+                 【RIGHT-2-C】门店服务指南区域 START
+                 位置：右侧下部
+                 功能：帮助用户了解门店服务流程
+                 子模块：RIGHT-2-C-1(指南步骤)
+                 ========================================================== -->
+            <div class="info-card">
+                <div class="info-card-header">
+                    <span>📖 到店服务指南</span>
+                </div>
+                <div class="info-card-body">
+                    <!-- 【RIGHT-2-C-1-1】步骤1 -->
+                    <div class="guide-step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <div class="step-title">线上预约到店</div>
+                            <div class="step-desc">在APP或小程序预约到店时间，选择服务项目</div>
+                        </div>
+                    </div>
+                    <!-- 【RIGHT-2-C-1-2】步骤2 -->
+                    <div class="guide-step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <div class="step-title">到店体验/交割</div>
+                            <div class="step-desc">出示预约码，享受一对一贵金属投资咨询服务</div>
+                        </div>
+                    </div>
+                    <!-- 【RIGHT-2-C-1-3】步骤3 -->
+                    <div class="guide-step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <div class="step-title">实物交割/回购</div>
+                            <div class="step-desc">完成实物黄金交割或回购，获取专业鉴定证书</div>
+                        </div>
+                    </div>
+                    <!-- 【RIGHT-2-C-1-4】步骤4 -->
+                    <div class="guide-step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <div class="step-title">评价与反馈</div>
+                            <div class="step-desc">服务完成后可对门店进行评价，帮助我们持续改进</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 【RIGHT-2-C】门店服务指南区域 END -->
+
+        </aside>
+        <!-- 【RIGHT-2】右侧边栏区域 END -->
+
+    </div>
+    <!-- 【MAIN-0】主体内容外层容器 END -->
+
+    <!-- ==========================================================
+         【BOTTOM-1】底部三栏区域 START
+         位置：主体内容下方
+         功能：市场动态、交易指南、热门活动
+         ========================================================== -->
+    <div class="bottom-section">
+
+        <!-- ==========================================================
+             【BOTTOM-1-A】市场动态区域 START
+             位置：底部左栏
+             功能：新闻资讯列表
+             子模块：BOTTOM-1-A-1(新闻项)
+             接口：[30] GET /api/news/list
+             ========================================================== -->
+        <div class="bottom-card">
+            <!-- 【BOTTOM-1-A-A】卡片头部 START -->
+            <div class="bottom-card-header">
+                <h3>📰 市场动态</h3>
+                <div class="tabs">
+                    <span class="active">要闻</span>
+                    <span>公告</span>
+                </div>
+            </div>
+            <!-- 【BOTTOM-1-A-A】卡片头部 END -->
+            <!-- 【BOTTOM-1-A-B】卡片内容区 START -->
+            <div class="bottom-card-body">
+                <!-- 【BOTTOM-1-A-1-1】新闻1 -->
+                <div class="news-item">
+                    <span class="news-tag important">重要</span>
+                    美联储暗示可能暂停加息，黄金价格短线拉升
+                    <div class="news-time">10分钟前</div>
+                </div>
+                <!-- 【BOTTOM-1-A-1-2】新闻2 -->
+                <div class="news-item">
+                    <span class="news-tag normal">资讯</span>
+                    全球央行持续增持黄金储备，需求保持强劲
+                    <div class="news-time">30分钟前</div>
+                </div>
+                <!-- 【BOTTOM-1-A-1-3】新闻3 -->
+                <div class="news-item">
+                    <span class="news-tag normal">资讯</span>
+                    美元指数走弱，贵金属板块集体上涨
+                    <div class="news-time">1小时前</div>
+                </div>
+                <!-- 【BOTTOM-1-A-1-4】新闻4 -->
+                <div class="news-item">
+                    <span class="news-tag important">重要</span>
+                    本平台模拟交易大赛即将开启，赢取实物黄金
+                    <div class="news-time">2小时前</div>
+                </div>
+                <!-- 【BOTTOM-1-A-1-5】新闻5 -->
+                <div class="news-item">
+                    <span class="news-tag normal">资讯</span>
+                    白银工业需求增长，分析师看好后市表现
+                    <div class="news-time">3小时前</div>
+                </div>
+            </div>
+            <!-- 【BOTTOM-1-A-B】卡片内容区 END -->
+        </div>
+        <!-- 【BOTTOM-1-A】市场动态区域 END -->
+
+        <!-- ==========================================================
+             【BOTTOM-1-B】交易指南区域 START
+             位置：底部中栏
+             功能：帮助链接列表
+             子模块：BOTTOM-1-B-1(指南项)
+             ========================================================== -->
+        <div class="bottom-card">
+            <!-- 【BOTTOM-1-B-A】卡片头部 -->
+            <div class="bottom-card-header">
+                <h3>📖 交易指南</h3>
+            </div>
+            <!-- 【BOTTOM-1-B-B】卡片内容区 START -->
+            <div class="bottom-card-body">
+                <!-- 【BOTTOM-1-B-1-1】指南1 快速入门 -->
+                <div class="guide-item">
+                    <div class="guide-icon" style="background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);">🎯</div>
+                    <div>
+                        <div class="guide-title">如何开始模拟交易</div>
+                        <div class="guide-desc">新用户快速入门指南，注册即送10万虚拟资金</div>
+                    </div>
+                </div>
+                <!-- 【BOTTOM-1-B-1-2】指南2 交易规则 -->
+                <div class="guide-item">
+                    <div class="guide-icon" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">📋</div>
+                    <div>
+                        <div class="guide-title">模拟交易规则说明</div>
+                        <div class="guide-desc">了解撮合机制、手续费率和盈亏计算</div>
+                    </div>
+                </div>
+                <!-- 【BOTTOM-1-B-1-3】指南3 排行榜 -->
+                <div class="guide-item">
+                    <div class="guide-icon" style="background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);">🏆</div>
+                    <div>
+                        <div class="guide-title">如何冲击收益排行榜</div>
+                        <div class="guide-desc">掌握交易技巧，提升排名赢取奖励</div>
+                    </div>
+                </div>
+                <!-- 【BOTTOM-1-B-1-4】指南4 风险提示 -->
+                <div class="guide-item">
+                    <div class="guide-icon" style="background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);">⚠️</div>
+                    <div>
+                        <div class="guide-title">模拟交易风险提示</div>
+                        <div class="guide-desc">虚拟资金交易，学习为主，理性投资</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 【BOTTOM-1-B-B】卡片内容区 END -->
+        </div>
+        <!-- 【BOTTOM-1-B】交易指南区域 END -->
+
+        <!-- ==========================================================
+             【BOTTOM-1-C】热门活动/商城入口区域 START
+             位置：底部右栏
+             功能：展示进行中的活动和推荐商品
+             子模块：BOTTOM-1-C-1(活动卡片)
+             接口：[22] GET /api/mall/activity/ongoing
+                  [19] GET /api/mall/goods/list
+             ========================================================== -->
+        <div class="bottom-card">
+            <!-- 【BOTTOM-1-C-A】卡片头部 -->
+            <div class="bottom-card-header">
+                <h3>🎁 热门活动</h3>
+                <a href="#">进入商城 ></a>
+            </div>
+            <!-- 【BOTTOM-1-C-B】卡片内容区 START -->
+            <div class="bottom-card-body">
+                <!-- 【BOTTOM-1-C-1-1】活动卡片1 -->
+                <div class="activity-card">
+                    <div class="activity-card-header">
+                        <span class="activity-name">新用户首购专享</span>
+                        <span class="activity-badge">进行中</span>
+                    </div>
+                    <div class="activity-goods">投资金条 10g / 20g / 50g</div>
+                    <div class="activity-price">
+                        <span class="now">¥723/g</span>
+                        <span class="origin">¥750/g</span>
+                    </div>
+                </div>
+                <!-- 【BOTTOM-1-C-1-2】活动卡片2 -->
+                <div class="activity-card">
+                    <div class="activity-card-header">
+                        <span class="activity-name">模拟交易大赛</span>
+                        <span class="activity-badge">报名中</span>
+                    </div>
+                    <div class="activity-goods">周收益Top10赢实物黄金</div>
+                    <div class="activity-price">
+                        <span class="now">立即报名</span>
+                    </div>
+                </div>
+                <!-- 【BOTTOM-1-C-1-3】活动卡片3 -->
+                <div class="activity-card">
+                    <div class="activity-card-header">
+                        <span class="activity-name">节日限定金币</span>
+                        <span class="activity-badge">即将开始</span>
+                    </div>
+                    <div class="activity-goods">2026纪念金币 限量发售</div>
+                    <div class="activity-price">
+                        <span class="now">¥3,680</span>
+                        <span class="origin">¥3,980</span>
+                    </div>
+                </div>
+            </div>
+            <!-- 【BOTTOM-1-C-B】卡片内容区 END -->
+        </div>
+        <!-- 【BOTTOM-1-C】热门活动/商城入口区域 END -->
+
+    </div>
+    <!-- 【BOTTOM-1】底部三栏区域 END -->
+
+    <!-- ==========================================================
+         【FOOTER-1】页脚区域 START
+         位置：页面最底部
+         功能：平台信息、链接、版权
+         ========================================================== -->
+    <footer class="footer">
+        <!-- 【FOOTER-1-A】页脚内容区 START -->
+        <div class="footer-content">
+            <!-- 【FOOTER-1-A-1】品牌介绍 -->
+            <div class="footer-brand">
+                <h3>🏆 GoldSim 模拟投资平台</h3>
+                <p>致力于为投资者提供零风险的贵金属模拟交易环境。使用虚拟资金，体验真实行情，学习交易技巧，提升投资能力。支持黄金、白银、铂金模拟交易，更有实物商城和线下门店服务。</p>
+                <p style="margin-top: 12px;">客服热线：400-888-8888</p>
+            </div>
+            <!-- 【FOOTER-1-A-2】关于我们栏目 -->
+            <div class="footer-links">
+                <h4>关于我们</h4>
+                <ul>
+                    <li><a href="#">平台简介</a></li>
+                    <li><a href="#">资质证照</a></li>
+                    <li><a href="#">合作伙伴</a></li>
+                    <li><a href="#">联系我们</a></li>
+                </ul>
+            </div>
+            <!-- 【FOOTER-1-A-3】交易服务栏目 -->
+            <div class="footer-links">
+                <h4>交易服务</h4>
+                <ul>
+                    <li><a href="#">品种介绍</a></li>
+                    <li><a href="#">模拟规则</a></li>
+                    <li><a href="#">费率说明</a></li>
+                    <li><a href="#">门店查询</a></li>
+                </ul>
+            </div>
+            <!-- 【FOOTER-1-A-4】帮助中心栏目 -->
+            <div class="footer-links">
+                <h4>帮助中心</h4>
+                <ul>
+                    <li><a href="#">新手指南</a></li>
+                    <li><a href="#">常见问题</a></li>
+                    <li><a href="#">安全保障</a></li>
+                    <li><a href="#">风险提示</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- 【FOOTER-1-A】页脚内容区 END -->
+
+        <!-- 【FOOTER-1-B】版权信息栏 -->
+        <div class="footer-bottom">
+            <p>© 2026 GoldSim 模拟投资平台 版权所有 | 市场有风险，投资需谨慎 | 模拟交易仅供学习，不构成投资建议</p>
+        </div>
+    </footer>
+    <!-- 【FOOTER-1】页脚区域 END -->
+
+    <!-- ==========================================================
+         【CENTER-2-C】门店详情弹窗区域 START
+         位置：页面全局覆盖层
+         功能：展示选中门店的完整信息（含地图坐标）
+         子模块：CENTER-2-C-1(遮罩), CENTER-2-C-2(弹窗容器),
+                 CENTER-2-C-3(详情内容)
+         接口：[25] GET /api/store/{storeId}
+         ========================================================== -->
+    <div class="store-modal-overlay" id="storeModal">
+        <!-- 【CENTER-2-C-1】遮罩（点击关闭） -->
+        <div style="position:absolute;inset:0;" onclick="closeStoreModal()"></div>
+        <!-- 【CENTER-2-C-2】弹窗容器 START -->
+        <div class="store-modal-container">
+            <!-- 【CENTER-2-C-3-a】弹窗头部 -->
+            <div class="store-modal-header">
+                <h3 id="modalStoreName">门店详情</h3>
+                <button class="modal-close" onclick="closeStoreModal()">×</button>
+            </div>
+            <!-- 【CENTER-2-C-3-b】弹窗内容 START -->
+            <div class="store-modal-body">
+                <!-- 【CENTER-2-C-3-b-1】详情大图 -->
+                <div class="store-detail-cover">
+                    <div id="modalStoreCover" style="width:100%;height:100%;background:linear-gradient(135deg,#c9a96e22,#b8941d22);display:flex;align-items:center;justify-content:center;font-size:64px;">🏪</div>
+                </div>
+                <!-- 【CENTER-2-C-3-b-2】详情信息网格 -->
+                <div class="store-detail-grid">
+                    <div class="detail-item">
+                        <div class="label">门店评分</div>
+                        <div class="value highlight" id="modalStoreRating">⭐ 4.9</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">评价数量</div>
+                        <div class="value" id="modalStoreRatingCount">128条</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">联系电话</div>
+                        <div class="value" id="modalStorePhone">010-8888-1001</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">营业时间</div>
+                        <div class="value" id="modalStoreHours">09:30-21:30</div>
+                    </div>
+                </div>
+                <!-- 【CENTER-2-C-3-b-3】详细地址 -->
+                <div class="detail-item" style="margin-bottom:16px;">
+                    <div class="label">详细地址</div>
+                    <div class="value" id="modalStoreAddress" style="margin-top:6px;font-weight:400;">北京市朝阳区建国门外大街1号国贸商城B1层</div>
+                </div>
+                <!-- 【CENTER-2-C-3-b-4】经纬度坐标展示 -->
+                <div class="detail-item" style="margin-bottom:16px;">
+                    <div class="label">地图坐标</div>
+                    <div class="value" style="margin-top:6px;font-weight:400;font-size:13px;color:#666;" id="modalStoreCoords">
+                        经度: 116.4609°E &nbsp;|&nbsp; 纬度: 39.9092°N
+                    </div>
+                </div>
+                <!-- 【CENTER-2-C-3-b-5】地图占位 -->
+                <div class="store-detail-map">
+                    <div style="text-align:center;">
+                        <div style="font-size:32px;margin-bottom:8px;">🗺️</div>
+                        <p>地图导航区域</p>
+                        <p style="font-size:12px;color:#bbb;margin-top:4px;">接入地图SDK后显示精确位置及导航路线</p>
+                    </div>
+                </div>
+            </div>
+            <!-- 【CENTER-2-C-3-b】弹窗内容 END -->
+            <!-- 【CENTER-2-C-3-c】操作按钮 -->
+            <div class="store-modal-footer">
+                <button class="store-action-btn secondary" onclick="closeStoreModal()">关闭</button>
+                <button class="store-action-btn primary" onclick="openMapNavigate(currentStoreId)">🧭 导航到店</button>
+                <button class="store-action-btn primary" onclick="makeAppointment()">📅 预约到店</button>
+            </div>
+        </div>
+        <!-- 【CENTER-2-C-2】弹窗容器 END -->
+    </div>
+    <!-- 【CENTER-2-C】门店详情弹窗区域 END -->
+
+    <!-- ==========================================================
+         【TOAST-1】消息提示区域 START
+         位置：页面右上角固定
+         功能：操作成功/失败提示
+         ========================================================== -->
+    <div class="toast" id="toast"></div>
+    <!-- 【TOAST-1】消息提示区域 END -->
+
+    <script>
+        // ================================================================
+        //  GoldSim 门店服务页 - JavaScript 逻辑层
+        // ================================================================
+        //  全局配置
+        // ================================================================
+        const API_BASE = 'http://localhost:8080/api';
+
+        // ================================================================
+        //  全局状态
+        // ================================================================
+        let currentCity = '';           // 当前选中城市
+        let currentPage = 1;            // 当前页码
+        let currentStoreId = null;        // 当前查看的门店ID
+        let currentSort = 'recommend';    // 当前排序方式
+        let userLocation = null;          // 用户定位坐标
+
+        // 门店Mock数据（API不可用时使用）
+        const storeMockData = {
+            1: { storeId: 1, storeName: '北京朝阳旗舰店', province: '北京市', city: '北京', district: '朝阳区', address: '北京市朝阳区建国门外大街1号国贸商城B1层', longitude: 116.4609, latitude: 39.9092, phone: '010-8888-1001', businessHours: '09:30-21:30', coverImage: '', rating: 4.9, ratingCount: 128 },
+            2: { storeId: 2, storeName: '北京海淀体验店', province: '北京市', city: '北京', district: '海淀区', address: '北京市海淀区中关村大街27号中关村广场购物中心2层', longitude: 116.3160, latitude: 39.9845, phone: '010-8888-1002', businessHours: '10:00-22:00', coverImage: '', rating: 4.7, ratingCount: 86 },
+            3: { storeId: 3, storeName: '上海浦东旗舰店', province: '上海市', city: '上海', district: '浦东新区', address: '上海市浦东新区陆家嘴环路1000号恒生银行大厦1层', longitude: 121.5050, latitude: 31.2350, phone: '021-8888-2001', businessHours: '09:30-21:30', coverImage: '', rating: 4.8, ratingCount: 156 },
+            4: { storeId: 4, storeName: '上海静安体验店', province: '上海市', city: '上海', district: '静安区', address: '上海市静安区南京西路1266号恒隆广场B1层', longitude: 121.4550, latitude: 31.2300, phone: '021-8888-2002', businessHours: '10:00-22:00', coverImage: '', rating: 4.6, ratingCount: 92 },
+            5: { storeId: 5, storeName: '深圳南山旗舰店', province: '广东省', city: '深圳', district: '南山区', address: '深圳市南山区粤海街道科苑南路2666号中国华润大厦B1层', longitude: 113.9430, latitude: 22.5230, phone: '0755-8888-3001', businessHours: '09:30-21:30', coverImage: '', rating: 4.8, ratingCount: 134 },
+            6: { storeId: 6, storeName: '深圳福田体验店', province: '广东省', city: '深圳', district: '福田区', address: '深圳市福田区福华三路168号深圳国际商会中心1层', longitude: 114.0570, latitude: 22.5430, phone: '0755-8888-3002', businessHours: '10:00-22:00', coverImage: '', rating: 4.5, ratingCount: 78 },
+            7: { storeId: 7, storeName: '广州天河旗舰店', province: '广东省', city: '广州', district: '天河区', address: '广州市天河区天河路208号粤海天河城大厦1层', longitude: 113.3250, latitude: 23.1370, phone: '020-8888-4001', businessHours: '09:30-21:30', coverImage: '', rating: 4.7, ratingCount: 112 },
+            8: { storeId: 8, storeName: '广州越秀体验店', province: '广东省', city: '广州', district: '越秀区', address: '广州市越秀区中山五路70号捷登都会B1层', longitude: 113.2700, latitude: 23.1300, phone: '020-8888-4002', businessHours: '10:00-22:00', coverImage: '', rating: 4.5, ratingCount: 65 },
+            9: { storeId: 9, storeName: '杭州西湖旗舰店', province: '浙江省', city: '杭州', district: '西湖区', address: '杭州市西湖区延安路609号七层', longitude: 120.1650, latitude: 30.2550, phone: '0571-8888-5001', businessHours: '09:30-21:30', coverImage: '', rating: 4.6, ratingCount: 98 },
+            10: { storeId: 10, storeName: '成都锦江旗舰店', province: '四川省', city: '成都', district: '锦江区', address: '成都市锦江区红星路三段1号IFS国际金融中心L1层', longitude: 104.0800, latitude: 30.6600, phone: '028-8888-6001', businessHours: '09:30-21:30', coverImage: '', rating: 4.7, ratingCount: 105 },
+            11: { storeId: 11, storeName: '南京鼓楼体验店', province: '江苏省', city: '南京', district: '鼓楼区', address: '南京市鼓楼区中山路18号德基广场B1层', longitude: 118.7800, latitude: 32.0600, phone: '025-8888-7001', businessHours: '10:00-22:00', coverImage: '', rating: 4.4, ratingCount: 72 },
+            12: { storeId: 12, storeName: '武汉江汉旗舰店', province: '湖北省', city: '武汉', district: '江汉区', address: '武汉市江汉区建设大道568号新世界国贸大厦1层', longitude: 114.2700, latitude: 30.5900, phone: '027-8888-8001', businessHours: '09:30-21:30', coverImage: '', rating: 4.6, ratingCount: 88 }
+        };
+
+        // ================================================================
+        //  【API-1】通用请求封装
+        // ================================================================
+        async function apiRequest(url, options = {}) {
+            const token = localStorage.getItem('token') || '';
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                }
+            };
+            try {
+                const response = await fetch(API_BASE + url, { ...defaultOptions, ...options });
+                const result = await response.json();
+                if (result.code === 'A00000') {
+                    return result.data;
+                } else {
+                    showToast(result.msg || '请求失败', 'error');
+                    return null;
+                }
+            } catch (err) {
+                console.error('API请求失败:', url, err);
+                return null;
+            }
+        }
+
+        // ================================================================
+        //  【API-2】门店服务接口
+        // ================================================================
+
+        /**
+         * 获取门店列表
+         * 接口：[24] GET /api/store/list?page=&size=&city=
+         */
+        async function fetchStoreList(page = 1, size = 5, city = '') {
+            let url = `/store/list?page=${page}&size=${size}`;
+            if (city) url += `&city=${encodeURIComponent(city)}`;
+            const data = await apiRequest(url);
+            return data;
+        }
+
+        /**
+         * 获取门店详情
+         * 接口：[25] GET /api/store/{storeId}
+         */
+        async function fetchStoreDetail(storeId) {
+            const data = await apiRequest(`/store/${storeId}`);
+            return data;
+        }
+
+        /**
+         * 获取附近门店
+         * 接口：[26] GET /api/store/nearby?lng=&lat=&radius=
+         */
+        async function fetchNearbyStores(lng, lat, radius = 5) {
+            const data = await apiRequest(`/store/nearby?lng=${lng}&lat=${lat}&radius=${radius}`);
+            return data;
+        }
+
+        /**
+         * 获取推荐门店
+         * 接口：[29] GET /api/store/recommend?city=&limit=10
+         */
+        async function fetchRecommendStores(city = '', limit = 10) {
+            let url = `/store/recommend?limit=${limit}`;
+            if (city) url += `&city=${encodeURIComponent(city)}`;
+            const data = await apiRequest(url);
+            return data;
+        }
+
+        // ================================================================
+        //  【UI-1】城市筛选与搜索
+        // ================================================================
+
+        function filterByCity(el, city) {
+            currentCity = city;
+            currentPage = 1;
+
+            // 更新UI激活状态
+            document.querySelectorAll('.city-tag').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.city-list-item').forEach(t => t.classList.remove('active'));
+
+            if (el.classList.contains('city-tag')) {
+                el.classList.add('active');
+                document.querySelector(`.city-list-item[data-city="${city}"]`)?.classList.add('active');
+            } else {
+                el.classList.add('active');
+                document.querySelector(`.city-tag[data-city="${city}"]`)?.classList.add('active');
+            }
+
+            // 更新标题
+            const title = city ? `（${city}市 · 筛选中）` : '（全部城市 · 共 12 家门店）';
+            document.getElementById('storeListTitle').textContent = title;
+
+            // 加载门店列表
+            loadStoreList();
+            showToast(city ? `已筛选：${city}市` : '已显示全部城市', 'success');
+        }
+
+        function toggleFilterChip(el) {
+            const parent = el.parentElement;
+            parent.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function switchSort(el, sortType) {
+            currentSort = sortType;
+            document.querySelectorAll('.sort-tabs span').forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+            loadStoreList();
+        }
+
+        function switchMapView(el, viewType) {
+            document.querySelectorAll('.map-action-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+
+            if (viewType === 'nearby' && !userLocation) {
+                showToast('请先点击左侧"定位并查找附近门店"', 'info');
+                return;
+            }
+
+            if (viewType === 'all') {
+                document.querySelector('.map-placeholder').style.display = 'flex';
+                document.getElementById('mapMarkers').style.display = 'none';
+                document.querySelector('.map-placeholder').innerHTML = `
+                    <div class="icon">🗺️</div>
+                    <p>地图加载中，或点击"定位并查找附近门店"获取位置</p>
+                    <div class="sub">接入高德/百度地图 SDK 后显示真实门店分布</div>
+                `;
+            } else if (viewType === 'nearby') {
+                document.querySelector('.map-placeholder').style.display = 'none';
+                document.getElementById('mapMarkers').style.display = 'block';
+            } else {
+                showToast('推荐门店视图', 'info');
+            }
+        }
+
+        function searchStores() {
+            const keyword = document.getElementById('storeSearchInput').value.trim();
+            if (!keyword) {
+                showToast('请输入搜索关键词', 'error');
+                return;
+            }
+            showToast(`搜索门店：${keyword}`, 'info');
+            // 实际应调用搜索接口
+        }
+
+        // ================================================================
+        //  【UI-2】门店列表渲染
+        // ================================================================
+
+        async function loadStoreList() {
+            const data = await fetchStoreList(currentPage, 5, currentCity);
+            if (data && data.list) {
+                renderStoreList(data.list);
+                renderPagination(data);
+            } else {
+                // Mock模式：从本地数据筛选
+                const mockList = Object.values(storeMockData).filter(s => {
+                    return !currentCity || s.city === currentCity;
+                });
+                renderStoreList(mockList.slice((currentPage - 1) * 5, currentPage * 5));
+            }
+        }
+
+        function renderStoreList(list) {
+            const container = document.getElementById('storeCardList');
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">暂无门店数据</div>';
+                return;
+            }
+            container.innerHTML = list.map((store, index) => {
+                const tagClass = store.rating >= 4.8 ? '旗舰店' : '体验店';
+                const isActive = index === 0 ? ' active' : '';
+                return `
+                    <div class="store-card${isActive}" data-store-id="${store.storeId}" onclick="showStoreDetail(${store.storeId})">
+                        <div class="store-card-cover">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#c9a96e33,#b8941d33);display:flex;align-items:center;justify-content:center;font-size:40px;">🏪</div>
+                            <span class="store-tag">${tagClass}</span>
+                        </div>
+                        <div class="store-card-info">
+                            <div class="store-card-header">
+                                <div class="store-name">${store.storeName}</div>
+                                <div class="store-rating">⭐ ${store.rating}</div>
+                            </div>
+                            <div class="store-address">📍 ${store.address}</div>
+                            <div class="store-meta">
+                                <span>📞 ${store.phone}</span>
+                                <span>🕐 ${store.businessHours}</span>
+                                <span>💬 ${store.ratingCount}条评价</span>
+                            </div>
+                        </div>
+                        <div class="store-card-actions">
+                            <button class="store-action-btn primary" onclick="event.stopPropagation();showStoreDetail(${store.storeId})">查看详情</button>
+                            <button class="store-action-btn secondary" onclick="event.stopPropagation();openMapNavigate(${store.storeId})">导航到店</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPagination(pageData) {
+            // 简化分页渲染
+            const totalPages = pageData?.pages || 3;
+            const container = document.getElementById('storePagination');
+            let html = `<button class="page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">‹</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            html += `<span class="page-info">共 ${totalPages} 页</span>`;
+            html += `<button class="page-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">›</button>`;
+            container.innerHTML = html;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            loadStoreList();
+        }
+
+        // ================================================================
+        //  【UI-3】门店详情弹窗
+        // ================================================================
+
+        async function showStoreDetail(storeId) {
+            currentStoreId = storeId;
+            const data = await fetchStoreDetail(storeId);
+            const store = data || storeMockData[storeId];
+
+            if (!store) {
+                showToast('门店信息不存在', 'error');
+                return;
+            }
+
+            document.getElementById('modalStoreName').textContent = store.storeName;
+            document.getElementById('modalStoreRating').textContent = '⭐ ' + store.rating;
+            document.getElementById('modalStoreRatingCount').textContent = store.ratingCount + '条';
+            document.getElementById('modalStorePhone').textContent = store.phone;
+            document.getElementById('modalStoreHours').textContent = store.businessHours;
+            document.getElementById('modalStoreAddress').textContent = store.address;
+            document.getElementById('modalStoreCoords').innerHTML =
+                `经度: ${store.longitude}°E &nbsp;|&nbsp; 纬度: ${store.latitude}°N`;
+
+            document.getElementById('storeModal').classList.add('active');
+        }
+
+        function closeStoreModal() {
+            document.getElementById('storeModal').classList.remove('active');
+        }
+
+        function openMapNavigate(storeId) {
+            const store = storeMockData[storeId];
+            if (store) {
+                const url = `https://uri.amap.com/navigation?to=${store.longitude},${store.latitude},${encodeURIComponent(store.storeName)}&mode=car&policy=1`;
+                window.open(url, '_blank');
+            }
+        }
+
+        function makeAppointment() {
+            showToast('预约功能开发中，敬请期待！', 'info');
+        }
+
+        // ================================================================
+        //  【UI-4】附近门店定位
+        // ================================================================
+
+        async function locateNearbyStores() {
+            const btn = document.getElementById('locateBtn');
+            btn.disabled = true;
+            btn.textContent = '🔍 定位中...';
+
+            if (!navigator.geolocation) {
+                showToast('您的浏览器不支持地理定位', 'error');
+                btn.disabled = false;
+                btn.textContent = '📍 定位并查找附近门店';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    userLocation = {
+                        lng: position.coords.longitude,
+                        lat: position.coords.latitude
+                    };
+                    showToast(`定位成功！经度: ${userLocation.lng.toFixed(4)}, 纬度: ${userLocation.lat.toFixed(4)}`, 'success');
+
+                    // 调用附近门店接口
+                    const nearby = await fetchNearbyStores(userLocation.lng, userLocation.lat, 5);
+                    if (nearby && nearby.length > 0) {
+                        renderNearbyStores(nearby);
+                    } else {
+                        // Mock附近数据
+                        renderNearbyStores([
+                            { storeId: 1, storeName: '北京朝阳旗舰店', address: '北京市朝阳区建国门外大街', distance: 2.3, rating: 4.9 },
+                            { storeId: 2, storeName: '北京海淀体验店', address: '北京市海淀区中关村大街', distance: 8.7, rating: 4.7 },
+                            { storeId: 3, storeName: '上海浦东旗舰店', address: '上海市浦东新区陆家嘴环路', distance: 1205.6, rating: 4.8 }
+                        ]);
+                    }
+
+                    btn.disabled = false;
+                    btn.textContent = '📍 重新定位并查找';
+                },
+                (error) => {
+                    let msg = '定位失败';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED: msg = '用户拒绝了定位请求'; break;
+                        case error.POSITION_UNAVAILABLE: msg = '位置信息不可用'; break;
+                        case error.TIMEOUT: msg = '定位超时'; break;
+                    }
+                    showToast(msg + '，将使用默认位置', 'error');
+                    // 使用默认位置（北京国贸）
+                    userLocation = { lng: 116.4609, lat: 39.9092 };
+                    renderNearbyStores([
+                        { storeId: 1, storeName: '北京朝阳旗舰店', address: '北京市朝阳区建国门外大街', distance: 0.1, rating: 4.9 },
+                        { storeId: 2, storeName: '北京海淀体验店', address: '北京市海淀区中关村大街', distance: 12.5, rating: 4.7 }
+                    ]);
+                    btn.disabled = false;
+                    btn.textContent = '📍 定位并查找附近门店';
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        function renderNearbyStores(list) {
+            const container = document.getElementById('nearbyList');
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">附近暂无门店</div>';
+                return;
+            }
+            container.innerHTML = list.map(store => `
+                <div class="nearby-item" onclick="showStoreDetail(${store.storeId})">
+                    <div class="nearby-distance">${store.distance < 1 ? (store.distance * 1000).toFixed(0) + 'm' : store.distance.toFixed(1) + 'km'}</div>
+                    <div class="nearby-info">
+                        <div class="nearby-name">${store.storeName}</div>
+                        <div class="nearby-addr">${store.address}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ================================================================
+        //  【UI-5】推荐门店
+        // ================================================================
+
+        async function loadRecommendStores() {
+            const data = await fetchRecommendStores(currentCity, 10);
+            if (data && data.length > 0) {
+                renderRecommendStores(data);
+            } else {
+                // Mock数据已静态渲染
+                showToast('已刷新推荐列表', 'success');
+            }
+        }
+
+        function renderRecommendStores(list) {
+            const container = document.getElementById('recommendList');
+            container.innerHTML = list.map((store, index) => {
+                const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'normal';
+                return `
+                    <div class="recommend-item" onclick="showStoreDetail(${store.storeId})">
+                        <div class="recommend-rank ${rankClass}">${index + 1}</div>
+                        <div class="recommend-info">
+                            <div class="recommend-name">${store.storeName}</div>
+                            <div class="recommend-addr">${store.address || store.city + '市'}</div>
+                        </div>
+                        <div class="recommend-rating">⭐ ${store.rating}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ================================================================
+        //  【UI-6】Toast 提示
+        // ================================================================
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ================================================================
+        //  【INIT-1】页面初始化
+        // ================================================================
+
+        async function initPage() {
+            // 加载门店列表
+            await loadStoreList();
+
+            // 加载推荐门店
+            await loadRecommendStores();
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>'''
+
+print("Part 2 generated successfully, length:", len(html_part2))
+
+
+
+
+
+
+
+
+
+
+
+# 合并两部分并保存文件
+# 先读取第一部分（之前生成的）
+part1 = '''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoldSim 贵金属模拟投资平台 - 门店服务</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5; color: #333; min-width: 1200px;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* ============================================================
+           【BG-1】页面全局背景层
+           位置：整个页面最底层
+           功能：页面整体背景色/背景图
+           备注：如需添加背景图片，修改此处
+           ============================================================ */
+
+        /* ============================================================
+           【TOP-1】顶部跑马灯行情区域
+           位置：页面最顶部
+           功能：显示各品种实时价格滚动（仅 AU/AG/PT）
+           子模块：TOP-1-A(容器), TOP-1-B(内容滚动), TOP-1-C(品种项)
+           接口对应：[10] GET /api/market/price/latest
+           ============================================================ */
+        .ticker-bar {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff; height: 40px; line-height: 40px;
+            overflow: hidden; position: relative;
+        }
+        /* 【TOP-1-A】跑马灯内容容器 */
+        .ticker-content {
+            display: flex; animation: ticker 30s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        /* 【TOP-1-C】单个品种行情项 */
+        .ticker-item {
+            display: inline-flex; align-items: center;
+            padding: 0 30px; font-size: 14px;
+        }
+        .ticker-item .name { color: #c9a96e; font-weight: 600; margin-right: 8px; }
+        .ticker-item .price { font-weight: 700; margin-right: 8px; }
+        .ticker-item .change-up { color: #ff4d4f; }
+        .ticker-item .change-down { color: #52c41a; }
+
+        /* ============================================================
+           【HEADER-1】头部导航区域
+           位置：跑马灯下方
+           功能：Logo、搜索、用户操作
+           子模块：HEADER-1-A(顶部栏), HEADER-1-B(导航菜单)
+           ============================================================ */
+        .header {
+            background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        /* 【HEADER-1-A】头部顶部栏 */
+        .header-top {
+            width: 1200px; margin: 0 auto; padding: 20px 0;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        /* 【HEADER-1-A-1】Logo区域 */
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        /* 【HEADER-1-A-1a】Logo图标 */
+        .logo-icon {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; font-size: 28px;
+        }
+        /* 【HEADER-1-A-1b】Logo文字 */
+        .logo-text h1 { font-size: 24px; color: #1a1a2e; font-weight: 700; letter-spacing: 1px; }
+        .logo-text p { font-size: 12px; color: #999; margin-top: 2px; }
+        /* 【HEADER-1-A-2】搜索区域 */
+        .search-area { flex: 1; max-width: 500px; margin: 0 40px; }
+        /* 【HEADER-1-A-2a】搜索框 */
+        .search-box { display: flex; border: 2px solid #c9a96e; border-radius: 8px; overflow: hidden; }
+        .search-box input { flex: 1; padding: 12px 16px; border: none; outline: none; font-size: 14px; }
+        .search-box button {
+            padding: 0 24px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; border: none; font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        /* 【HEADER-1-A-3】用户操作区域 */
+        .user-area { display: flex; align-items: center; gap: 20px; }
+        .user-area a { font-size: 14px; color: #666; transition: color 0.3s; }
+        .user-area a:hover { color: #c9a96e; }
+        /* 【HEADER-1-A-3a】登录按钮 */
+        .btn-login {
+            padding: 8px 24px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff !important; border-radius: 6px; font-weight: 600;
+        }
+
+        /* ============================================================
+           【HEADER-1-B】主导航菜单区域
+           位置：头部下方
+           功能：页面主导航（当前选中"门店服务"）
+           子模块：HEADER-1-B-1(分类下拉), HEADER-1-B-2(菜单项)
+           ============================================================ */
+        .nav-bar { background: #1a1a2e; height: 50px; line-height: 50px; }
+        /* 【HEADER-1-B-0】导航内容容器 */
+        .nav-content { width: 1200px; margin: 0 auto; display: flex; align-items: center; }
+        /* 【HEADER-1-B-1】品种分类下拉 */
+        .nav-category {
+            width: 220px; background: #c9a96e; color: #fff;
+            text-align: center; font-size: 16px; font-weight: 600; cursor: pointer;
+        }
+        /* 【HEADER-1-B-2】导航菜单项列表 */
+        .nav-menu { display: flex; flex: 1; padding-left: 20px; }
+        /* 【HEADER-1-B-2-N】单个导航项 */
+        .nav-menu li {
+            padding: 0 28px; color: #fff; font-size: 15px;
+            cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .nav-menu li:hover { color: #c9a96e; }
+        .nav-menu li.active::after {
+            content: ''; position: absolute; bottom: 0; left: 20%;
+            width: 60%; height: 3px; background: #c9a96e;
+        }
+
+        /* ============================================================
+           【MAIN-0】主体内容外层容器
+           位置：导航下方
+           功能：包裹门店服务页面内容
+           ============================================================ */
+        .main-container {
+            width: 1200px; margin: 20px auto;
+            display: flex; gap: 16px;
+        }
+
+        /* ============================================================
+           【LEFT-2】左侧边栏区域（门店服务页）
+           位置：主体左侧
+           功能：城市筛选、门店分类、快速导航
+           子模块：LEFT-2-A(城市筛选), LEFT-2-B(分类筛选), LEFT-2-C(快捷操作)
+           宽度：220px
+           ============================================================ */
+        .sidebar-left {
+            width: 220px; display: flex; flex-direction: column; gap: 16px;
+        }
+        /* 【LEFT-2-X】左侧卡片通用样式 */
+        .left-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        /* 【LEFT-2-X-A】卡片标题栏 */
+        .left-card-header {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff; font-size: 15px; font-weight: 600;
+        }
+        /* 【LEFT-2-X-B】卡片内容区 */
+        .left-card-body { padding: 12px 16px; }
+
+        /* ============================================================
+           【LEFT-2-A】城市筛选区域
+           位置：左侧上部
+           功能：按城市筛选门店列表
+           子模块：LEFT-2-A-1(热门城市), LEFT-2-A-2(城市列表)
+           接口对应：[24] GET /api/store/list?city={city}
+           ============================================================ */
+        /* 【LEFT-2-A-1】热门城市快捷标签 */
+        .city-hot-tags {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+            padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
+        }
+        .city-tag {
+            padding: 4px 12px; border-radius: 12px; font-size: 12px;
+            background: #f5f5f5; color: #666; cursor: pointer; transition: all 0.3s;
+        }
+        .city-tag:hover, .city-tag.active {
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff;
+        }
+        /* 【LEFT-2-A-2】城市列表 */
+        .city-list { max-height: 200px; overflow-y: auto; }
+        .city-list-item {
+            padding: 8px 12px; border-radius: 6px; cursor: pointer;
+            font-size: 13px; color: #666; transition: all 0.3s;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .city-list-item:hover, .city-list-item.active {
+            background: #fff8e6; color: #c9a96e;
+        }
+        .city-list-item .count { font-size: 11px; color: #999; }
+        .city-list-item.active .count { color: #c9a96e; }
+
+        /* ============================================================
+           【LEFT-2-B】门店分类筛选区域
+           位置：城市筛选下方
+           功能：按服务类型筛选门店
+           ============================================================ */
+        .filter-group { margin-bottom: 12px; }
+        .filter-group:last-child { margin-bottom: 0; }
+        .filter-label { font-size: 12px; color: #999; margin-bottom: 8px; }
+        .filter-options { display: flex; flex-wrap: wrap; gap: 6px; }
+        .filter-chip {
+            padding: 4px 10px; border-radius: 4px; font-size: 12px;
+            border: 1px solid #e0e0e0; color: #666; cursor: pointer;
+            transition: all 0.3s; background: #fff;
+        }
+        .filter-chip:hover, .filter-chip.active {
+            border-color: #c9a96e; color: #c9a96e; background: #fff8e6;
+        }
+
+        /* ============================================================
+           【LEFT-2-C】定位快捷操作区域
+           位置：左侧下部
+           功能：一键定位附近门店
+           接口对应：[26] GET /api/store/nearby?lng=&lat=&radius=
+           ============================================================ */
+        .locate-btn {
+            width: 100%; padding: 12px 0; border: none; border-radius: 8px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s; display: flex; align-items: center;
+            justify-content: center; gap: 8px;
+        }
+        .locate-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .locate-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        /* ============================================================
+           【CENTER-2】中间主内容区域（门店服务页）
+           位置：主体中间
+           功能：门店地图、门店列表、门店详情
+           子模块：CENTER-2-A(地图区域), CENTER-2-B(门店列表),
+                   CENTER-2-C(门店详情卡片)
+           宽度：自适应
+           ============================================================ */
+        .main-content { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+        /* ============================================================
+           【CENTER-2-A】门店地图区域
+           位置：中间区域顶部
+           功能：展示门店分布地图，支持点击跳转详情
+           子模块：CENTER-2-A-1(地图工具栏), CENTER-2-A-2(地图容器)
+           接口对应：[26] GET /api/store/nearby?lng=&lat=&radius=
+           ============================================================ */
+        .map-section {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        /* 【CENTER-2-A-1】地图工具栏 */
+        .map-toolbar {
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .map-toolbar h3 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .map-toolbar .map-actions { display: flex; gap: 8px; }
+        .map-action-btn {
+            padding: 6px 14px; border-radius: 6px; font-size: 13px;
+            border: 1px solid #e0e0e0; background: #fff; color: #666;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .map-action-btn:hover, .map-action-btn.active {
+            border-color: #c9a96e; color: #c9a96e; background: #fff8e6;
+        }
+        /* 【CENTER-2-A-2】地图容器 */
+        .map-container {
+            height: 320px; background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+            position: relative; display: flex; align-items: center; justify-content: center;
+        }
+        .map-placeholder {
+            text-align: center; color: #999;
+        }
+        .map-placeholder .icon { font-size: 48px; margin-bottom: 12px; }
+        .map-placeholder p { font-size: 14px; }
+        .map-placeholder .sub { font-size: 12px; color: #bbb; margin-top: 4px; }
+        /* 地图上的门店标记点（Mock展示） */
+        .map-markers { position: absolute; inset: 0; }
+        .map-marker {
+            position: absolute; width: 32px; height: 40px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .map-marker:hover { transform: rotate(-45deg) scale(1.2); z-index: 10; }
+        .map-marker span {
+            transform: rotate(45deg); color: #fff; font-size: 14px; font-weight: 700;
+        }
+        .map-marker.active {
+            background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);
+            transform: rotate(-45deg) scale(1.3); z-index: 20;
+        }
+
+        /* ============================================================
+           【CENTER-2-B】门店列表区域
+           位置：地图下方
+           功能：展示门店卡片列表，支持分页
+           子模块：CENTER-2-B-1(列表工具栏), CENTER-2-B-2(门店卡片列表),
+                   CENTER-2-B-3(分页器)
+           接口对应：[24] GET /api/store/list?page=&size=&city=
+                    [29] GET /api/store/recommend?city=&limit=
+           ============================================================ */
+        .store-list-section {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 20px;
+        }
+        /* 【CENTER-2-B-1】列表工具栏 */
+        .list-toolbar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;
+        }
+        .list-toolbar h3 { font-size: 16px; font-weight: 600; }
+        .list-toolbar .sort-tabs { display: flex; gap: 16px; }
+        .sort-tabs span {
+            font-size: 13px; color: #999; cursor: pointer; transition: color 0.3s;
+            position: relative;
+        }
+        .sort-tabs span.active { color: #c9a96e; font-weight: 600; }
+        .sort-tabs span.active::after {
+            content: ''; position: absolute; bottom: -4px; left: 0;
+            width: 100%; height: 2px; background: #c9a96e; border-radius: 1px;
+        }
+        /* 【CENTER-2-B-2】门店卡片列表 */
+        .store-card-list { display: flex; flex-direction: column; gap: 12px; }
+        /* 【CENTER-2-B-2-N】单个门店卡片 */
+        .store-card {
+            display: flex; gap: 16px; padding: 16px;
+            border: 1px solid #f0f0f0; border-radius: 10px;
+            transition: all 0.3s; cursor: pointer;
+        }
+        .store-card:hover {
+            border-color: #c9a96e; box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            transform: translateY(-1px);
+        }
+        .store-card.active {
+            border-color: #c9a96e; background: #fff8e6;
+        }
+        /* 【CENTER-2-B-2-N-a】门店封面图 */
+        .store-card-cover {
+            width: 140px; height: 100px; border-radius: 8px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            flex-shrink: 0; overflow: hidden; position: relative;
+        }
+        .store-card-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .store-card-cover .store-tag {
+            position: absolute; top: 6px; left: 6px;
+            padding: 2px 8px; border-radius: 4px; font-size: 11px;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; font-weight: 600;
+        }
+        /* 【CENTER-2-B-2-N-b】门店信息区 */
+        .store-card-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .store-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .store-name { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+        .store-rating {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 13px; color: #ff9500; font-weight: 600;
+        }
+        .store-address {
+            font-size: 13px; color: #666; margin-top: 6px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .store-meta {
+            display: flex; gap: 16px; margin-top: 8px;
+            font-size: 12px; color: #999;
+        }
+        .store-meta span { display: flex; align-items: center; gap: 4px; }
+        /* 【CENTER-2-B-2-N-c】门店操作区 */
+        .store-card-actions {
+            display: flex; flex-direction: column; gap: 8px;
+            justify-content: center; flex-shrink: 0;
+        }
+        .store-action-btn {
+            padding: 8px 16px; border-radius: 6px; font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: all 0.3s;
+            border: none; text-align: center; white-space: nowrap;
+        }
+        .store-action-btn.primary {
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff;
+        }
+        .store-action-btn.primary:hover { opacity: 0.9; }
+        .store-action-btn.secondary {
+            background: #f5f5f5; color: #666; border: 1px solid #e0e0e0;
+        }
+        .store-action-btn.secondary:hover { background: #e8e8e8; }
+        /* 【CENTER-2-B-3】分页器 */
+        .pagination {
+            display: flex; justify-content: center; align-items: center;
+            gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0;
+        }
+        .page-btn {
+            min-width: 32px; height: 32px; border-radius: 6px;
+            border: 1px solid #e0e0e0; background: #fff;
+            color: #666; font-size: 13px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+        }
+        .page-btn:hover:not(:disabled) { border-color: #c9a96e; color: #c9a96e; }
+        .page-btn.active {
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; border-color: #c9a96e;
+        }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .page-info { font-size: 13px; color: #999; margin: 0 8px; }
+
+        /* ============================================================
+           【CENTER-2-C】门店详情弹窗区域
+           位置：页面全局覆盖层
+           功能：展示选中门店的完整信息（含地图坐标）
+           子模块：CENTER-2-C-1(遮罩), CENTER-2-C-2(弹窗容器),
+                   CENTER-2-C-3(详情内容)
+           接口对应：[25] GET /api/store/{storeId}
+           ============================================================ */
+        .store-modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .store-modal-overlay.active { display: flex; }
+        .store-modal-container {
+            background: #fff; border-radius: 16px; width: 640px; max-width: 90%;
+            max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .store-modal-header {
+            padding: 20px 24px; border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; background: #fff; z-index: 10;
+            border-radius: 16px 16px 0 0;
+        }
+        .store-modal-header h3 { font-size: 18px; font-weight: 700; }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%; border: none;
+            background: #f5f5f5; cursor: pointer; font-size: 16px; color: #999;
+        }
+        .modal-close:hover { background: #e0e0e0; color: #333; }
+        .store-modal-body { padding: 24px; }
+        /* 【CENTER-2-C-3-a】详情大图 */
+        .store-detail-cover {
+            width: 100%; height: 200px; border-radius: 10px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            overflow: hidden; margin-bottom: 20px;
+        }
+        .store-detail-cover img { width: 100%; height: 100%; object-fit: cover; }
+        /* 【CENTER-2-C-3-b】详情信息网格 */
+        .store-detail-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+        }
+        .detail-item { background: #f8f9fa; border-radius: 8px; padding: 14px; }
+        .detail-item .label { font-size: 12px; color: #999; margin-bottom: 6px; }
+        .detail-item .value { font-size: 15px; font-weight: 600; color: #333; }
+        .detail-item .value.highlight { color: #c9a96e; }
+        /* 【CENTER-2-C-3-c】地图坐标展示 */
+        .store-detail-map {
+            height: 200px; border-radius: 10px; background: #f0f0f0;
+            margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
+            color: #999; font-size: 14px;
+        }
+        /* 【CENTER-2-C-3-d】操作按钮 */
+        .store-modal-footer {
+            padding: 0 24px 24px; display: flex; gap: 12px;
+        }
+        .store-modal-footer .store-action-btn { flex: 1; padding: 12px 0; font-size: 15px; }
+
+        /* ============================================================
+           【RIGHT-2】右侧边栏区域（门店服务页）
+           位置：主体右侧
+           功能：推荐门店、附近门店快捷入口、门店服务指南
+           子模块：RIGHT-2-A(推荐门店), RIGHT-2-B(附近门店),
+                   RIGHT-2-C(门店服务指南)
+           宽度：280px
+           ============================================================ */
+        .sidebar-right {
+            width: 280px; display: flex; flex-direction: column; gap: 16px;
+        }
+        /* 【RIGHT-2-X】右侧信息卡片通用样式 */
+        .info-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        /* 【RIGHT-2-X-A】卡片标题栏 */
+        .info-card-header {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-size: 15px; font-weight: 600; color: #333;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .info-card-header a { font-size: 13px; color: #c9a96e; }
+        /* 【RIGHT-2-X-B】卡片内容区 */
+        .info-card-body { padding: 12px 16px; }
+
+        /* ============================================================
+           【RIGHT-2-A】推荐门店区域
+           位置：右侧上部
+           功能：展示评分最高的推荐门店
+           子模块：RIGHT-2-A-1(推荐项)
+           接口对应：[29] GET /api/store/recommend?city=&limit=10
+           ============================================================ */
+        .recommend-list { padding: 8px 0; }
+        /* 【RIGHT-2-A-1-N】单个推荐项 */
+        .recommend-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0; border-bottom: 1px solid #f5f5f5; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .recommend-item:last-child { border-bottom: none; }
+        .recommend-item:hover { background: #fafafa; margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
+        .recommend-rank {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .recommend-rank.gold { background: linear-gradient(135deg, #ffd700 0%, #ffb800 100%); color: #fff; }
+        .recommend-rank.silver { background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%); color: #fff; }
+        .recommend-rank.bronze { background: linear-gradient(135deg, #cd7f32 0%, #b87333 100%); color: #fff; }
+        .recommend-rank.normal { background: #f0f0f0; color: #999; }
+        .recommend-info { flex: 1; min-width: 0; }
+        .recommend-name { font-size: 14px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .recommend-addr { font-size: 11px; color: #999; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .recommend-rating { font-size: 12px; color: #ff9500; font-weight: 600; flex-shrink: 0; }
+
+        /* ============================================================
+           【RIGHT-2-B】附近门店区域
+           位置：右侧中部
+           功能：基于当前定位展示附近门店
+           子模块：RIGHT-2-B-1(附近项)
+           接口对应：[26] GET /api/store/nearby?lng=&lat=&radius=5
+           ============================================================ */
+        .nearby-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0; border-bottom: 1px solid #f5f5f5; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nearby-item:last-child { border-bottom: none; }
+        .nearby-item:hover { background: #fafafa; margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
+        .nearby-distance {
+            width: 50px; text-align: right; font-size: 12px;
+            color: #c9a96e; font-weight: 600; flex-shrink: 0;
+        }
+        .nearby-info { flex: 1; min-width: 0; }
+        .nearby-name { font-size: 14px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nearby-addr { font-size: 11px; color: #999; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* ============================================================
+           【RIGHT-2-C】门店服务指南区域
+           位置：右侧下部
+           功能：帮助用户了解门店服务流程
+           子模块：RIGHT-2-C-1(指南项)
+           ============================================================ */
+        .guide-step {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 12px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .guide-step:last-child { border-bottom: none; }
+        .step-num {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; flex-shrink: 0;
+        }
+        .step-content { flex: 1; }
+        .step-title { font-size: 14px; font-weight: 600; color: #333; }
+        .step-desc { font-size: 12px; color: #999; margin-top: 4px; line-height: 1.5; }
+
+        /* ============================================================
+           【BOTTOM-1】底部三栏区域
+           位置：主体内容下方
+           功能：市场动态、交易指南、热门活动
+           子模块：BOTTOM-1-A(市场动态), BOTTOM-1-B(交易指南),
+                   BOTTOM-1-C(热门活动/商城入口)
+           ============================================================ */
+        .bottom-section {
+            width: 1200px; margin: 20px auto 40px;
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+        }
+        /* 【BOTTOM-1-X】底部卡片通用样式 */
+        .bottom-card {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden;
+        }
+        /* 【BOTTOM-1-X-A】卡片头部 */
+        .bottom-card-header {
+            padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .bottom-card-header h3 { font-size: 16px; font-weight: 600; }
+        .bottom-card-header .tabs { display: flex; gap: 16px; }
+        .bottom-card-header .tabs span { font-size: 13px; color: #999; cursor: pointer; }
+        .bottom-card-header .tabs span.active { color: #c9a96e; font-weight: 600; }
+        .bottom-card-header a { font-size: 13px; color: #c9a96e; }
+        /* 【BOTTOM-1-X-B】卡片内容 */
+        .bottom-card-body { padding: 12px 20px; }
+
+        /* ============================================================
+           【BOTTOM-1-A】市场动态区域
+           位置：底部左栏
+           功能：新闻资讯列表
+           子模块：BOTTOM-1-A-1(新闻项)
+           接口对应：[30] GET /api/news/list
+           ============================================================ */
+        .news-item {
+            padding: 10px 0; border-bottom: 1px solid #f5f5f5;
+            font-size: 14px; cursor: pointer; transition: color 0.3s;
+        }
+        .news-item:last-child { border-bottom: none; }
+        .news-item:hover { color: #c9a96e; }
+        .news-tag {
+            display: inline-block; padding: 2px 6px; border-radius: 3px;
+            font-size: 11px; margin-right: 8px;
+        }
+        .news-tag.important { background: #fff2f0; color: #cf1322; }
+        .news-tag.normal { background: #e6f7ff; color: #096dd9; }
+        .news-tag.activity { background: #f6ffed; color: #389e0d; }
+        .news-time { font-size: 12px; color: #999; margin-top: 4px; }
+
+        /* ============================================================
+           【BOTTOM-1-B】交易指南区域
+           位置：底部中栏
+           功能：帮助链接列表
+           子模块：BOTTOM-1-B-1(指南项)
+           ============================================================ */
+        .guide-item {
+            padding: 10px 0; border-bottom: 1px solid #f5f5f5;
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+        }
+        .guide-item:last-child { border-bottom: none; }
+        .guide-icon {
+            width: 40px; height: 40px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 18px; flex-shrink: 0;
+        }
+        .guide-title { font-weight: 600; font-size: 14px; }
+        .guide-desc { font-size: 12px; color: #999; margin-top: 4px; }
+
+        /* ============================================================
+           【BOTTOM-1-C】热门活动/商城入口区域
+           位置：底部右栏
+           功能：展示进行中的活动和推荐商品
+           子模块：BOTTOM-1-C-1(活动卡片)
+           接口对应：[22] GET /api/mall/activity/ongoing
+                    [19] GET /api/mall/goods/list
+           ============================================================ */
+        .activity-card {
+            padding: 12px;
+            background: linear-gradient(135deg, #fff8e6 0%, #fff 100%);
+            border-radius: 8px; border: 1px solid #ffe7ba;
+            margin-bottom: 10px; cursor: pointer; transition: all 0.3s;
+        }
+        .activity-card:hover { transform: translateX(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .activity-card:last-child { margin-bottom: 0; }
+        .activity-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .activity-name { font-size: 14px; font-weight: 600; color: #333; }
+        .activity-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #ff4d4f; color: #fff; }
+        .activity-goods { font-size: 13px; color: #666; }
+        .activity-price { margin-top: 6px; display: flex; align-items: baseline; gap: 8px; }
+        .activity-price .now { font-size: 18px; font-weight: 700; color: #ff4d4f; }
+        .activity-price .origin { font-size: 13px; color: #999; text-decoration: line-through; }
+
+        /* ============================================================
+           【FOOTER-1】页脚区域
+           位置：页面最底部
+           功能：平台信息、链接、版权
+           子模块：FOOTER-1-A(内容区), FOOTER-1-B(版权栏)
+           ============================================================ */
+        .footer {
+            background: #1a1a2e; color: #fff;
+            padding: 40px 0 20px; margin-top: 40px;
+        }
+        .footer-content {
+            width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+        }
+        .footer-brand h3 { font-size: 20px; margin-bottom: 12px; }
+        .footer-brand p { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.8; }
+        .footer-brand p { margin-top: 12px; }
+        .footer-links h4 { font-size: 15px; margin-bottom: 16px; color: #c9a96e; }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a { font-size: 13px; color: rgba(255,255,255,0.6); transition: color 0.3s; }
+        .footer-links a:hover { color: #c9a96e; }
+        .footer-bottom {
+            width: 1200px; margin: 30px auto 0; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center; font-size: 12px; color: rgba(255,255,255,0.4);
+        }
+
+        /* ============================================================
+           【TOAST-1】消息提示区域
+           位置：页面右上角固定
+           功能：操作成功/失败提示
+           ============================================================ */
+        .toast {
+            position: fixed; top: 60px; right: 30px;
+            padding: 14px 24px; border-radius: 8px; color: #fff;
+            font-size: 14px; font-weight: 600; z-index: 3000;
+            transform: translateX(150%); transition: transform 0.4s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); }
+        .toast.error { background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%); }
+        .toast.info { background: linear-gradient(135deg, #c9a96e 0%, #b8941d 100%); }
+
+        /* ============================================================
+           【RESPONSIVE-1】响应式提示区域
+           位置：页面顶部固定（仅在窄屏显示）
+           功能：提示用户使用宽屏浏览
+           ============================================================ */
+        @media (max-width: 1200px) {
+            body::before {
+                content: '请使用 1200px 以上宽度浏览以获得最佳体验';
+                position: fixed; top: 0; left: 0; right: 0;
+                background: #c9a96e; color: #fff;
+                text-align: center; padding: 8px; z-index: 9999; font-size: 13px;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <!-- ==========================================================
+         【BG-1】页面全局背景层
+         位置：整个页面最底层
+         功能：页面整体背景色/背景图
+         备注：如需添加背景图片，在body标签添加style="background-image:url(...)"
+         ========================================================== -->
+
+    <!-- ==========================================================
+         【TOP-1】顶部跑马灯行情区域 START
+         位置：页面最顶部
+         功能：显示各品种实时价格滚动（仅 AU/AG/PT）
+         接口：[10] GET /api/market/price/latest
+         ========================================================== -->
+    <div class="ticker-bar">
+        <!-- 【TOP-1-A】跑马灯内容容器 -->
+        <div class="ticker-content" id="tickerContent">
+            <!-- 【TOP-1-C-1】黄金行情项 -->
+            <div class="ticker-item">
+                <span class="name">黄金 AU</span>
+                <span class="price" id="tickerAuPrice">¥723.15</span>
+                <span class="change-up" id="tickerAuChange">▲ +1.25 +0.25%</span>
+            </div>
+            <!-- 【TOP-1-C-2】白银行情项 -->
+            <div class="ticker-item">
+                <span class="name">白银 AG</span>
+                <span class="price" id="tickerAgPrice">¥6.85</span>
+                <span class="change-up" id="tickerAgChange">▲ +0.03 +0.46%</span>
+            </div>
+            <!-- 【TOP-1-C-3】铂金行情项 -->
+            <div class="ticker-item">
+                <span class="name">铂金 PT</span>
+                <span class="price" id="tickerPtPrice">¥228.50</span>
+                <span class="change-down" id="tickerPtChange">▼ -1.20 -0.52%</span>
+            </div>
+            <!-- 重复一组用于无缝滚动 -->
+            <div class="ticker-item">
+                <span class="name">黄金 AU</span>
+                <span class="price">¥723.15</span>
+                <span class="change-up">▲ +1.25 +0.25%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">白银 AG</span>
+                <span class="price">¥6.85</span>
+                <span class="change-up">▲ +0.03 +0.46%</span>
+            </div>
+            <div class="ticker-item">
+                <span class="name">铂金 PT</span>
+                <span class="price">¥228.50</span>
+                <span class="change-down">▼ -1.20 -0.52%</span>
+            </div>
+        </div>
+    </div>
+    <!-- 【TOP-1】顶部跑马灯行情区域 END -->
+
+    <!-- ==========================================================
+         【HEADER-1】头部导航区域 START
+         位置：跑马灯下方
+         功能：Logo、搜索、用户操作、主导航
+         ========================================================== -->
+    <header class="header">
+        <!-- 【HEADER-1-A】头部顶部栏 START -->
+        <div class="header-top">
+            <!-- 【HEADER-1-A-1】Logo区域 START -->
+            <div class="logo-area">
+                <!-- 【HEADER-1-A-1a】Logo图标 -->
+                <div class="logo-icon">🏆</div>
+                <!-- 【HEADER-1-A-1b】Logo文字 -->
+                <div class="logo-text">
+                    <h1>GoldSim 模拟投资</h1>
+                    <p>虚拟资金 · 真实行情 · 零风险练手</p>
+                </div>
+            </div>
+            <!-- 【HEADER-1-A-1】Logo区域 END -->
+
+            <!-- 【HEADER-1-A-2】搜索区域 START -->
+            <div class="search-area">
+                <!-- 【HEADER-1-A-2a】搜索框 -->
+                <div class="search-box">
+                    <input type="text" id="storeSearchInput" placeholder="搜索门店名称、城市、地址...">
+                    <button onclick="searchStores()">搜索</button>
+                </div>
+            </div>
+            <!-- 【HEADER-1-A-2】搜索区域 END -->
+
+            <!-- 【HEADER-1-A-3】用户操作区域 START -->
+            <div class="user-area">
+                <a href="#">帮助中心</a>
+                <a href="#">下载APP</a>
+                <!-- 【HEADER-1-A-3a】登录按钮 -->
+                <a href="#" class="btn-login">登录 / 注册</a>
+            </div>
+            <!-- 【HEADER-1-A-3】用户操作区域 END -->
+        </div>
+        <!-- 【HEADER-1-A】头部顶部栏 END -->
+
+        <!-- 【HEADER-1-B】主导航菜单区域 START -->
+        <nav class="nav-bar">
+            <div class="nav-content">
+                <!-- 【HEADER-1-B-1】品种分类下拉 -->
+                <div class="nav-category">📋 品种分类</div>
+                <!-- 【HEADER-1-B-2】导航菜单项列表 -->
+                <ul class="nav-menu">
+                    <!-- 【HEADER-1-B-2-1】行情中心 -->
+                    <li>行情中心</li>
+                    <!-- 【HEADER-1-B-2-2】模拟交易 -->
+                    <li>模拟交易</li>
+                    <!-- 【HEADER-1-B-2-3】排行榜 -->
+                    <li>排行榜</li>
+                    <!-- 【HEADER-1-B-2-4】商城 -->
+                    <li>实物商城</li>
+                    <!-- 【HEADER-1-B-2-5】门店服务（当前选中） -->
+                    <li class="active">门店服务</li>
+                    <!-- 【HEADER-1-B-2-6】资讯 -->
+                    <li>资讯动态</li>
+                    <!-- 【HEADER-1-B-2-7】个人中心 -->
+                    <li>个人中心</li>
+                </ul>
+            </div>
+        </nav>
+        <!-- 【HEADER-1-B】主导航菜单区域 END -->
+    </header>
+    <!-- 【HEADER-1】头部导航区域 END -->
+
+    <!-- ==========================================================
+         【MAIN-0】主体内容外层容器 START
+         位置：导航下方
+         功能：包裹门店服务页面左中右三栏
+         ========================================================== -->
+    <div class="main-container">
+
+        <!-- ==========================================================
+             【LEFT-2】左侧边栏区域 START
+             位置：主体左侧
+             功能：城市筛选、门店分类、快速定位
+             宽度：220px
+             ========================================================== -->
+        <aside class="sidebar-left">
+
+            <!-- ==========================================================
+                 【LEFT-2-A】城市筛选区域 START
+                 位置：左侧上部
+                 功能：按城市筛选门店列表
+                 子模块：LEFT-2-A-1(热门城市), LEFT-2-A-2(城市列表)
+                 接口：[24] GET /api/store/list?city={city}
+                 ========================================================== -->
+            <div class="left-card">
+                <!-- 【LEFT-2-A-A】卡片标题栏 -->
+                <div class="left-card-header">📍 城市筛选</div>
+                <!-- 【LEFT-2-A-B】卡片内容区 START -->
+                <div class="left-card-body">
+                    <!-- 【LEFT-2-A-1】热门城市快捷标签 START -->
+                    <div class="city-hot-tags">
+                        <span class="city-tag active" data-city="" onclick="filterByCity(this, '')">全部</span>
+                        <span class="city-tag" data-city="北京" onclick="filterByCity(this, '北京')">北京</span>
+                        <span class="city-tag" data-city="上海" onclick="filterByCity(this, '上海')">上海</span>
+                        <span class="city-tag" data-city="深圳" onclick="filterByCity(this, '深圳')">深圳</span>
+                        <span class="city-tag" data-city="广州" onclick="filterByCity(this, '广州')">广州</span>
+                    </div>
+                    <!-- 【LEFT-2-A-1】热门城市快捷标签 END -->
+                    <!-- 【LEFT-2-A-2】城市列表 START -->
+                    <div class="city-list" id="cityList">
+                        <!-- 【LEFT-2-A-2-1】城市项 -->
+                        <div class="city-list-item active" data-city="" onclick="filterByCity(this, '')">
+                            <span>全部城市</span><span class="count" id="cityCountAll">12家</span>
+                        </div>
+                        <div class="city-list-item" data-city="北京" onclick="filterByCity(this, '北京')">
+                            <span>北京市</span><span class="count">3家</span>
+                        </div>
+                        <div class="city-list-item" data-city="上海" onclick="filterByCity(this, '上海')">
+                            <span>上海市</span><span class="count">3家</span>
+                        </div>
+                        <div class="city-list-item" data-city="深圳" onclick="filterByCity(this, '深圳')">
+                            <span>深圳市</span><span class="count">2家</span>
+                        </div>
+                        <div class="city-list-item" data-city="广州" onclick="filterByCity(this, '广州')">
+                            <span>广州市</span><span class="count">2家</span>
+                        </div>
+                        <div class="city-list-item" data-city="杭州" onclick="filterByCity(this, '杭州')">
+                            <span>杭州市</span><span class="count">1家</span>
+                        </div>
+                        <div class="city-list-item" data-city="成都" onclick="filterByCity(this, '成都')">
+                            <span>成都市</span><span class="count">1家</span>
+                        </div>
+                    </div>
+                    <!-- 【LEFT-2-A-2】城市列表 END -->
+                </div>
+                <!-- 【LEFT-2-A-B】卡片内容区 END -->
+            </div>
+            <!-- 【LEFT-2-A】城市筛选区域 END -->
+
+            <!-- ==========================================================
+                 【LEFT-2-B】门店分类筛选区域 START
+                 位置：城市筛选下方
+                 功能：按服务类型筛选门店
+                 ========================================================== -->
+            <div class="left-card">
+                <div class="left-card-header">🏷️ 服务筛选</div>
+                <div class="left-card-body">
+                    <div class="filter-group">
+                        <div class="filter-label">门店类型</div>
+                        <div class="filter-options">
+                            <span class="filter-chip active" onclick="toggleFilterChip(this)">全部</span>
+                            <span class="filter-chip" onclick="toggleFilterChip(this)">旗舰店</span>
+                            <span class="filter-chip" onclick="toggleFilterChip(this)">体验店</span>
+                            <span class="filter-chip" onclick="toggleFilterChip(this)">合作店</span>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-label">服务项目</div>
+                        <div class="filter-options">
+                            <span class="filter-chip active" onclick="toggleFilterChip(this)">全部</span>
+                            <span class="filter-chip" onclick="toggleFilterChip(this)">实物交割</span>
+                            <span class="filter-chip" onclick="toggleFilterChip(this)">鉴定评估</span>
+                            <span class="filter-chip" onclick="toggleFilterChip(this)">回购服务</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 【LEFT-2-B】门店分类筛选区域 END -->
+
+            <!-- ==========================================================
+                 【LEFT-2-C】定位快捷操作区域 START
+                 位置：左侧下部
+                 功能：一键定位附近门店
+                 接口：[26] GET /api/store/nearby?lng=&lat=&radius=
+                 ========================================================== -->
+            <div class="left-card">
+                <div class="left-card-header">🎯 附近门店</div>
+                <div class="left-card-body">
+                    <p style="font-size:13px;color:#666;margin-bottom:12px;line-height:1.6;">
+                        开启定位权限，自动查找您附近的 GoldSim 门店，支持到店体验和实物交割服务。
+                    </p>
+                    <button class="locate-btn" id="locateBtn" onclick="locateNearbyStores()">
+                        📍 定位并查找附近门店
+                    </button>
+                </div>
+            </div>
+            <!-- 【LEFT-2-C】定位快捷操作区域 END -->
+
+        </aside>
+        <!-- 【LEFT-2】左侧边栏区域 END -->
+
+        <!-- ==========================================================
+             【CENTER-2】中间主内容区域 START
+             位置：主体中间
+             功能：门店地图、门店列表、门店详情
+             宽度：自适应
+             ========================================================== -->
+        <main class="main-content">
+
+            <!-- ==========================================================
+                 【CENTER-2-A】门店地图区域 START
+                 位置：中间区域顶部
+                 功能：展示门店分布地图，支持点击跳转详情
+                 子模块：CENTER-2-A-1(地图工具栏), CENTER-2-A-2(地图容器)
+                 接口：[26] GET /api/store/nearby?lng=&lat=&radius=
+                 ========================================================== -->
+            <div class="map-section">
+                <!-- 【CENTER-2-A-1】地图工具栏 START -->
+                <div class="map-toolbar">
+                    <h3>🗺️ 门店分布地图</h3>
+                    <div class="map-actions">
+                        <button class="map-action-btn active" onclick="switchMapView(this, 'all')">全部门店</button>
+                        <button class="map-action-btn" onclick="switchMapView(this, 'nearby')">附近5公里</button>
+                        <button class="map-action-btn" onclick="switchMapView(this, 'recommend')">推荐门店</button>
+                    </div>
+                </div>
+                <!-- 【CENTER-2-A-1】地图工具栏 END -->
+                <!-- 【CENTER-2-A-2】地图容器 START -->
+                <div class="map-container" id="mapContainer">
+                    <div class="map-placeholder">
+                        <div class="icon">🗺️</div>
+                        <p>地图加载中，或点击"定位并查找附近门店"获取位置</p>
+                        <div class="sub">接入高德/百度地图 SDK 后显示真实门店分布</div>
+                    </div>
+                    <!-- Mock 门店标记点（实际接入地图SDK后替换） -->
+                    <div class="map-markers" id="mapMarkers" style="display:none;">
+                        <div class="map-marker active" style="left:30%;top:35%;" onclick="showStoreDetail(1)" title="北京朝阳旗舰店"><span>1</span></div>
+                        <div class="map-marker" style="left:32%;top:38%;" onclick="showStoreDetail(2)" title="北京海淀体验店"><span>2</span></div>
+                        <div class="map-marker" style="left:65%;top:45%;" onclick="showStoreDetail(3)" title="上海浦东旗舰店"><span>3</span></div>
+                        <div class="map-marker" style="left:62%;top:48%;" onclick="showStoreDetail(4)" title="上海静安体验店"><span>4</span></div>
+                        <div class="map-marker" style="left:58%;top:75%;" onclick="showStoreDetail(5)" title="深圳南山旗舰店"><span>5</span></div>
+                    </div>
+                </div>
+                <!-- 【CENTER-2-A-2】地图容器 END -->
+            </div>
+            <!-- 【CENTER-2-A】门店地图区域 END -->
+
+            <!-- ==========================================================
+                 【CENTER-2-B】门店列表区域 START
+                 位置：地图下方
+                 功能：展示门店卡片列表，支持分页
+                 子模块：CENTER-2-B-1(列表工具栏), CENTER-2-B-2(门店卡片列表),
+                         CENTER-2-B-3(分页器)
+                 接口：[24] GET /api/store/list?page=&size=&city=
+                      [29] GET /api/store/recommend?city=&limit=
+                 ========================================================== -->
+            <div class="store-list-section">
+                <!-- 【CENTER-2-B-1】列表工具栏 START -->
+                <div class="list-toolbar">
+                    <h3>🏪 门店列表 <span style="font-size:13px;color:#999;font-weight:400;" id="storeListTitle">（全部城市 · 共 12 家门店）</span></h3>
+                    <div class="
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GoldSim 门店服务页 — 完整功能-接口-路径映射表
+表格
+页面位置（注释标记）	功能描述	接口路径（网关路由）	后端服务	Controller	方法签名	是否存在	认证
+【TOP-1】顶部跑马灯	实时行情价格滚动	GET /api/market/price/latest?metalType={AU/AG/PT}	gold-market-service	MarketController	getLatestPrice(String metalType)	✅ 已存在	否
+【HEADER-1-A-2a】搜索框	搜索门店	GET /api/store/list?page=&size=&city= + 前端本地过滤	gold-store-service	StoreController	list(Integer page, Integer size, String city)	⚠️ 需扩展keyword参数	否
+【LEFT-2-A】城市筛选	按城市筛选门店	GET /api/store/list?page={page}&size={size}&city={city}	gold-store-service	StoreController	list(Integer page, Integer size, String city)	✅ 已存在	否
+【LEFT-2-C】定位查找附近	GPS定位查附近门店	GET /api/store/nearby?lng={lng}&lat={lat}&radius={radius}	gold-store-service	StoreController	nearby(Double lng, Double lat, Double radius)	✅ 已存在	是
+【CENTER-2-A】地图-全部门店	地图展示全部	GET /api/store/list?page=1&size=100	gold-store-service	StoreController	list(...)	✅ 已存在	否
+【CENTER-2-A】地图-附近5公里	地图展示附近	GET /api/store/nearby?lng={lng}&lat={lat}&radius=5	gold-store-service	StoreController	nearby(...)	✅ 已存在	是
+【CENTER-2-A】地图-推荐门店	地图展示推荐	GET /api/store/recommend?city={city}&limit=50	gold-store-service	StoreController	recommend(String city, Integer limit)	✅ 已存在	是
+【CENTER-2-B】门店列表	分页门店卡片	GET /api/store/list?page={page}&size={size}&city={city}	gold-store-service	StoreController	list(...)	✅ 已存在	否
+【CENTER-2-B】排序-推荐	推荐排序	GET /api/store/recommend?city={city}&limit={limit}	gold-store-service	StoreController	recommend(...)	✅ 已存在	是
+【CENTER-2-B】排序-评分最高	按评分排序	GET /api/store/list + 前端排序 / 或扩展 sortBy=rating	gold-store-service	StoreController	list(...)	⚠️ 需扩展排序参数	否
+【CENTER-2-B】排序-距离最近	按距离排序	GET /api/store/nearby?lng={lng}&lat={lat}&radius=1000	gold-store-service	StoreController	nearby(...)	✅ 已存在	是
+【CENTER-2-B-2-N】查看详情	门店详情弹窗	GET /api/store/{storeId}	gold-store-service	StoreController	getById(Long storeId)	✅ 已存在	是
+【CENTER-2-B-2-N】导航到店	第三方地图导航	前端拼接URL，不调用后端	-	-	-	-	-
+【CENTER-2-C】详情-导航按钮	唤起地图APP	https://uri.amap.com/navigation?to={lng},{lat},{name}	高德地图（第三方）	-	-	-	-
+【CENTER-2-C】详情-预约按钮	预约到店服务	（暂无接口，需后续扩展）	-	-	-	❌ 待开发	是
+【RIGHT-2-A】推荐门店	评分Top推荐	GET /api/store/recommend?city={city}&limit=10	gold-store-service	StoreController	recommend(...)	✅ 已存在	是
+【RIGHT-2-A】刷新按钮	刷新推荐列表	GET /api/store/recommend?city={city}&limit=10	gold-store-service	StoreController	recommend(...)	✅ 已存在	是
+【RIGHT-2-B】附近门店	定位后附近列表	GET /api/store/nearby?lng={lng}&lat={lat}&radius=5	gold-store-service	StoreController	nearby(...)	✅ 已存在	是
+【RIGHT-2-B】重新定位	重新获取定位	同附近门店接口	gold-store-service	StoreController	nearby(...)	✅ 已存在	是
+【RIGHT-2-C】服务指南	静态展示，无接口	-	-	-	-	-	-
+【BOTTOM-1-A】市场动态	新闻资讯列表	GET /api/news/list?page=1&size=5	gold-news-service	NewsController	list(Integer page, Integer size, String category)	✅ 已存在	否
+【BOTTOM-1-B】交易指南	静态帮助链接	-	-	-	-	-	-
+【BOTTOM-1-C】热门活动	活动列表	GET /api/mall/activity/ongoing?page=1&size=3	gold-mall-service	ActivityShowController	ongoing(Integer page, Integer size)	✅ 已存在	是
+后端Controller详细路径映射
+表格
+服务名	Controller类	@RequestMapping	方法	完整内部路径	网关路由前缀
+gold-store-service	StoreController	/store	list(...)	/store/list	/api/store/list
+gold-store-service	StoreController	/store	getById(Long storeId)	/store/{storeId}	/api/store/{storeId}
+gold-store-service	StoreController	/store	nearby(Double lng, Double lat, Double radius)	/store/nearby	/api/store/nearby
+gold-store-service	StoreController	/store	recommend(String city, Integer limit)	/store/recommend	/api/store/recommend
+gold-store-service	StoreController	/store	save(Store store)	/store	/api/store
+gold-store-service	StoreController	/store	update(Long storeId, Store store)	/store/{storeId}	/api/store/{storeId}
+gold-market-service	MarketController	/market	getLatestPrice(String metalType)	/market/price/latest	/api/market/price/latest
+gold-news-service	NewsController	/news	list(...)	/news/list	/api/news/list
+gold-mall-service	ActivityShowController	/mall/activity	ongoing(...)	/mall/activity/ongoing	/api/mall/activity/ongoing
+需要扩展/补充的接口（⚠️标记项汇总）
+表格
+功能位置	当前问题	建议扩展方案
+搜索框	/api/store/list 无 keyword 参数	在 StoreController.list() 方法中增加 @RequestParam(required=false) String keyword，支持按门店名称/地址模糊搜索
+评分排序	/api/store/list 无排序参数	增加 sortBy 参数：sortBy=rating（评分降序）、sortBy=distance（距离升序，需传坐标）
+预约到店	无预约相关接口	新增 POST /api/store/appointment 接口，或复用订单服务的到店自提逻辑

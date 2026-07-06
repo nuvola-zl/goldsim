@@ -1,0 +1,114 @@
+首页模块与接口对照表
+【TOP-1】顶部区域
+表格
+位置	功能	接口	状态
+跑马灯行情	滚动显示 AU/AG/PT 实时价格	[10] GET /api/market/price/latest?metalType=AU/AG/PT	✅ 已有
+【HEADER-1】头部导航
+表格
+位置	功能	接口	状态
+搜索框	搜索商品/资讯（当前仅前端展示）	[24] GET /api/mall/search?keyword=	🆕 建议接入
+登录/注册按钮	跳转登录页	[1] POST /api/user/login / [2] POST /api/user/register	✅ 已有
+用户头像/名称（登录后）	显示当前用户信息	[10] GET /api/user/profile	🆕 新增
+登出按钮（登录后）	退出登录	[9] POST /api/user/logout	🆕 新增
+【LEFT-1】左侧品种列表
+表格
+位置	功能	接口	状态
+品种名称+代码	显示 AU/AG/PT	静态数据	—
+实时价格	显示最新价	[10] GET /api/market/price/latest	✅ 已有
+涨跌幅	显示涨跌百分比	[10] GET /api/market/price/latest	✅ 已有
+持仓量（新增）	显示当前品种持仓克重	[20] GET /api/simulation/position/{metalType}	🆕 建议新增
+【CENTER-1-A】行情头部
+表格
+位置	功能	接口	状态
+品种名称	AU/AG/PT 切换显示	前端状态	—
+大价格	最新成交价	[10] GET /api/market/price/latest	✅ 已有
+涨跌幅	涨跌金额+百分比	[10] GET /api/market/price/latest	✅ 已有
+开盘价/最高价/最低价/昨收	今日行情概览	[10] GET /api/market/price/latest	✅ 已有
+【CENTER-1-B】K线图
+表格
+位置	功能	接口	状态
+K线蜡烛图	价格走势	[13] GET /api/market/kline/today?metalType=	✅ 已有
+周期切换（1分/5分/15分/1小时/日K）	切换时间周期	前端切换，数据同 [13]	✅ 已有
+【CENTER-1-C】热点新闻轮播
+表格
+位置	功能	接口	状态
+新闻卡片（标题+摘要+标签+时间）	轮播展示热点新闻	[39] GET /api/news/ai-brief	🆕 建议替换现有静态数据
+或：新闻卡片	轮播展示最新新闻	[30] GET /api/news/list?page=1&size=6	🆕 备选方案
+左右切换按钮	手动切换	前端交互	—
+底部指示器	显示当前位置+跳转	前端交互	—
+建议： AI 简报 [39] 更适合轮播（精炼摘要），普通新闻 [30] 放底部市场动态
+【CENTER-1-D】模拟交易面板
+表格
+位置	功能	接口	状态
+虚拟余额显示	显示可用虚拟资金	[26] GET /api/simulation/account/overview → balance	🆕 接入
+买入/卖出切换	切换交易方向	前端交互	—
+当前品种+最新价	显示交易品种和价格	[10] GET /api/market/price/latest	✅ 已有
+数量输入框	输入交易克重（最小0.0001）	前端输入校验	—
+成交金额/手续费/总支出实时计算	根据数量×价格计算	前端计算	—
+确认买入/卖出按钮	打开确认弹窗	前端交互	—
+持仓快捷提示（已有但需接真实数据）	显示当前品种持仓+浮动盈亏	[20] GET /api/simulation/position/{metalType}	🆕 接入真实数据
+【CENTER-1-E】最近交易记录
+表格
+位置	功能	接口	状态
+交易类型标签（买入/卖出）	显示买卖方向	[23] GET /api/simulation/trade/history?page=1&size=5 → tradeType	🆕 接入
+品种名称	AU/AG/PT	[23] → metalType / metalName	🆕 接入
+交易详情（克重×单价）	显示交易明细	[23] → amount × price	🆕 接入
+交易金额+时间	显示支出/收入金额和时间	[23] → tradeValue / fee / createTime	🆕 接入
+"查看全部"链接	跳转交易记录完整页	[23] GET /api/simulation/trade/history（分页）	🆕 接入
+注意： 代码里已写 fetchTradeHistory 调用，但当前显示的是静态假数据，需要确认 renderTradeRecords 是否被正确调用
+【RIGHT-1-A】模拟资产概览
+表格
+位置	功能	接口	状态
+虚拟总资产	总资产大数字	[26] GET /api/simulation/account/overview → totalAsset	🆕 接入
+可用余额	可交易资金	[26] → balance	🆕 接入
+持仓市值	所有持仓市值总和	[26] → positionMarketValue	🆕 接入
+累计盈亏	已实现盈亏	[26] → totalProfit	🆕 接入
+今日盈亏	当日盈亏（暂为0）	[26] → todayProfit	🆕 接入（待实现）
+"详情 >"链接	跳转资产详情页	可扩展 [27] GET /api/simulation/account/flow	🆕 可选
+注意： 代码里已写 fetchAccountOverview 调用，但失败时走 Mock 分支显示 ¥100,000
+【RIGHT-1-B】实时排行榜
+表格
+位置	功能	接口	状态
+Top 10 排名列表	显示收益前10用户	[16] GET /api/simulation/leaderboard/top20	🆕 接入
+排名序号（金银铜牌样式）	1-3名特殊样式	[16] → rank	🆕 接入
+用户昵称（脱敏）	显示用户名称	[16] → nickname	🆕 接入
+盈亏金额	显示累计盈亏	[16] → totalProfit	🆕 接入
+"Top 20 >"链接	跳转完整排行榜	[16] GET /api/simulation/leaderboard/top20	🆕 接入
+WebSocket实时推送	排行榜数据更新	[WS-2] ws://localhost:8080/ws/leaderboard	✅ 已有
+注意： 代码里已写 fetchLeaderboard 调用，但当前显示的是静态假数据
+【RIGHT-1-C】我的排名
+表格
+位置	功能	接口	状态
+排名徽章（大数字）	显示当前排名	[17] GET /api/simulation/leaderboard/my-rank → rank	🆕 接入
+排名文字	"第X名 / 共X人"或"未上榜"	[17] → rank / onList	🆕 接入
+累计盈亏金额	显示我的盈亏	[17] → totalProfit	🆕 接入
+上榜状态提示	鼓励语或恭喜语	[17] → onList	🆕 接入
+"刷新"按钮	手动刷新排名	[17] GET /api/simulation/leaderboard/my-rank	🆕 接入
+注意： 代码里已写 fetchMyRank 调用，但当前显示的是静态假数据
+【BOTTOM-1-A】市场动态（底部左栏）
+表格
+位置	功能	接口	状态
+新闻列表（标题+标签+时间）	显示最新新闻	[30] GET /api/news/list?page=1&size=5	🆕 建议替换静态数据
+标签（重要/资讯/公告）	新闻分类标识	[30] → category	🆕 接入
+发布时间	显示多久前	[30] → publishTime	🆕 接入
+"要闻/公告"切换	分类筛选	[30] GET /api/news/list?category=	🆕 可选
+【BOTTOM-1-B】交易指南（底部中栏）
+表格
+位置	功能	接口	状态
+指南项列表	静态帮助链接	静态数据	—
+点击跳转	跳转帮助页面	前端路由	—
+建议： 保持静态，或接入 [29] GET /api/simulation/config 显示交易规则
+【BOTTOM-1-C】热门活动（底部右栏）
+表格
+位置	功能	接口	状态
+活动卡片（名称+状态+商品+价格）	显示进行中活动	[22] GET /api/mall/activity/ongoing?page=1&size=3	🆕 建议替换静态数据
+活动名称	显示活动标题	[22] → activityName	🆕 接入
+活动状态标签	进行中/报名中/即将开始	[22] → status	🆕 接入
+活动商品	显示参与活动的商品	[22] → goodsList → goodsName	🆕 接入
+活动价/原价	显示优惠价格	[22] → goodsList → activityPrice / originalPrice	🆕 接入
+"进入商城 >"链接	跳转商城首页	[26] GET /api/mall/home 或 /mall/goods/list	🆕 可选
+【MODAL-1】交易确认弹窗
+表格
+位置	功能	接口	状态
+交易信息确认	显示品种/类型/价格/数量/金额	前端状态	—
+确认按钮	提交交易	[14] POST /api/simulation/trade/buy / [15] POST /api/simulation/trade/sell

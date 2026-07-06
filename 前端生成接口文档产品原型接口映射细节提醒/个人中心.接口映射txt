@@ -1,0 +1,80 @@
+GoldSim 个人中心页 — 完整功能-接口-路径映射表
+表格
+页面位置（注释标记）	功能描述	接口路径（网关路由）	后端服务	Controller	方法签名	是否存在	认证
+【TOP-1】顶部跑马灯	实时行情价格滚动	GET /api/market/price/latest?metalType={AU/AG/PT}	gold-market-service	MarketController	getLatestPrice(String metalType)	✅ 已存在	否
+【HEADER-1-A-3】用户头像/昵称	展示当前登录用户信息	GET /api/user/profile	gold-user-service	UserInfoController	profile()	✅ 已存在	是
+【CENTER-4-A】用户信息卡片	用户基本信息（头像、用户名、手机号、实名状态）	GET /api/user/profile	gold-user-service	UserInfoController	profile()	✅ 已存在	是
+【CENTER-4-A】修改用户名	更新用户昵称	POST /api/user/update	gold-user-service	UserInfoController	update(UserUpdateDTO dto)	✅ 已存在	是
+【CENTER-4-A】上传头像	上传头像到OSS	POST /api/user/uploadAvatar	gold-user-service	UserInfoController	uploadAvatar(MultipartFile file)	✅ 已存在	是
+【CENTER-4-A】实名认证	提交实名认证信息	POST /api/user/realName	gold-user-service	UserInfoController	realName(UserRealNameDTO dto)	✅ 已存在	是
+【CENTER-4-B】修改密码	修改登录密码	POST /api/user/updatePassword	gold-user-service	UserInfoController	updatePassword(UserPasswordDTO dto)	✅ 已存在	是
+【CENTER-4-C】绑定支付宝	绑定/修改支付宝账号	（暂无独立接口，需扩展）	-	-	-	❌ 待开发	是
+【RIGHT-4-A】模拟资产总览	总资产、余额、持仓市值、盈亏	GET /api/simulation/account/overview	gold-simulation-service	SimulationQueryController	accountOverview()	✅ 已存在	是
+【RIGHT-4-A】刷新资产	手动刷新资产数据	GET /api/simulation/account/overview	gold-simulation-service	SimulationQueryController	accountOverview()	✅ 已存在	是
+【RIGHT-4-B】我的持仓	全部品种持仓列表	GET /api/simulation/position/list	gold-simulation-service	SimulationQueryController	positionList()	✅ 已存在	是
+【RIGHT-4-B】持仓盈亏分析	各品种浮动盈亏详情	GET /api/simulation/position/profit	gold-simulation-service	SimulationQueryController	positionProfit()	✅ 已存在	是
+【CENTER-4-D】交易记录	分页交易流水	GET /api/simulation/trade/history?page={page}&size={size}&metalType={metalType}&tradeType={tradeType}	gold-simulation-service	SimulationQueryController	tradeHistory(Integer page, Integer size, String metalType, String tradeType)	✅ 已存在	是
+【CENTER-4-D】交易记录-查看详情	单笔交易详情	GET /api/simulation/trade/history/{requestId}	gold-simulation-service	SimulationQueryController	tradeHistoryDetail(String requestId)	✅ 已存在	是
+【CENTER-4-E】资金流水	虚拟账户资金变动明细	GET /api/simulation/account/flow?page={page}&size={size}&tradeType={tradeType}	gold-simulation-service	SimulationQueryController	accountFlow(Integer page, Integer size, String tradeType)	✅ 已存在	是
+【CENTER-4-F】交易统计	胜率、交易次数、累计盈亏等	GET /api/simulation/account/statistics	gold-simulation-service	SimulationQueryController	accountStatistics()	✅ 已存在	是
+【CENTER-4-G】我的订单	实物商品订单列表	GET /api/order/list?status={status}&page={page}&size={size}	gold-order-service	OrderController	list(Integer status, Integer page, Integer size)	✅ 已存在	是
+【CENTER-4-G】取消订单	取消待支付订单	POST /api/order/cancel/{orderNo}	gold-order-service	OrderController	cancel(String orderNo)	✅ 已存在	是
+【CENTER-4-G】支付前校验	确认订单是否可支付	GET /api/order/{orderNo}/valid	gold-order-service	OrderController	valid(String orderNo)	✅ 已存在	是
+【CENTER-4-G】订单支付	发起支付宝支付	POST /api/user/pay/{orderNo}	gold-user-service	UserPayController	pay(String orderNo)	✅ 已存在	是
+【CENTER-4-H】我的排名	排行榜个人排名	GET /api/simulation/leaderboard/my-rank	gold-simulation-service	LeaderboardController	myRank()	✅ 已存在	是
+【CENTER-4-H】收益排行	Top20排行榜	GET /api/simulation/leaderboard/top20	gold-simulation-service	LeaderboardController	top20()	✅ 已存在	是
+【CENTER-4-I】退出登录	注销当前会话	POST /api/user/logout	gold-user-service	UserInfoController	logout()	✅ 已存在	是
+【BOTTOM-1-A】市场动态	底部新闻列表	GET /api/news/list?page=1&size=5	gold-news-service	NewsController	list(...)	✅ 已存在	否
+【BOTTOM-1-B】交易指南	静态帮助链接	-	-	-	-	-	-
+【BOTTOM-1-C】热门活动	活动列表	GET /api/mall/activity/ongoing?page=1&size=3	gold-mall-service	ActivityShowController	ongoing(...)	✅ 已存在	是
+后端Controller详细路径映射（个人中心专用）
+表格
+服务名	Controller类	@RequestMapping	方法	完整内部路径	网关路由前缀
+gold-user-service	UserInfoController	/user	profile()	/user/profile	/api/user/profile
+gold-user-service	UserInfoController	/user	update(UserUpdateDTO dto)	/user/update	/api/user/update
+gold-user-service	UserInfoController	/user	uploadAvatar(MultipartFile file)	/user/uploadAvatar	/api/user/uploadAvatar
+gold-user-service	UserInfoController	/user	realName(UserRealNameDTO dto)	/user/realName	/api/user/realName
+gold-user-service	UserInfoController	/user	updatePassword(UserPasswordDTO dto)	/user/updatePassword	/api/user/updatePassword
+gold-user-service	UserInfoController	/user	logout()	/user/logout	/api/user/logout
+gold-user-service	UserPayController	/user/pay	pay(String orderNo)	/user/pay/{orderNo}	/api/user/pay/{orderNo}
+gold-simulation-service	SimulationQueryController	/simulation	positionList()	/simulation/position/list	/api/simulation/position/list
+gold-simulation-service	SimulationQueryController	/simulation	position(String metalType)	/simulation/position/{metalType}	/api/simulation/position/{metalType}
+gold-simulation-service	SimulationQueryController	/simulation	positionAvailable(String metalType)	/simulation/position/{metalType}/available	/api/simulation/position/{metalType}/available
+gold-simulation-service	SimulationQueryController	/simulation	positionProfit()	/simulation/position/profit	/api/simulation/position/profit
+gold-simulation-service	SimulationQueryController	/simulation	tradeHistory(Integer page, Integer size, String metalType, String tradeType)	/simulation/trade/history	/api/simulation/trade/history
+gold-simulation-service	SimulationQueryController	/simulation	tradeHistoryDetail(String requestId)	/simulation/trade/history/{requestId}	/api/simulation/trade/history/{requestId}
+gold-simulation-service	SimulationQueryController	/simulation	accountInfo()	/simulation/account/info	/api/simulation/account/info
+gold-simulation-service	SimulationQueryController	/simulation	accountOverview()	/simulation/account/overview	/api/simulation/account/overview
+gold-simulation-service	SimulationQueryController	/simulation	accountFlow(Integer page, Integer size, String tradeType)	/simulation/account/flow	/api/simulation/account/flow
+gold-simulation-service	SimulationQueryController	/simulation	accountStatistics()	/simulation/account/statistics	/api/simulation/account/statistics
+gold-simulation-service	LeaderboardController	/simulation/leaderboard	top20()	/simulation/leaderboard/top20	/api/simulation/leaderboard/top20
+gold-simulation-service	LeaderboardController	/simulation/leaderboard	myRank()	/simulation/leaderboard/my-rank	/api/simulation/leaderboard/my-rank
+gold-order-service	OrderController	/order	list(Integer status, Integer page, Integer size)	/order/list	/api/order/list
+gold-order-service	OrderController	/order	cancel(String orderNo)	/order/cancel/{orderNo}	/api/order/cancel/{orderNo}
+gold-order-service	OrderController	/order	valid(String orderNo)	/order/{orderNo}/valid	/api/order/{orderNo}/valid
+gold-order-service	OrderController	/order	getByOrderNo(String orderNo)	/order/{orderNo}	/api/order/{orderNo}
+已废弃/不安全接口（个人中心不应使用）
+表格
+旧接口路径	问题	替代接口
+GET /api/user/info/{userId}	未校验userId归属，存在PII遍历漏洞	GET /api/user/profile
+POST /api/order/create/{userId}	userId从URL传入，存在身份伪造	应使用 POST /api/order/create（从UserContext取userId）
+POST /api/order/pay/{orderNo}?userId={userId}	userId从Query传入，可被篡改	POST /api/user/pay/{orderNo}
+需要扩展/补充的接口（⚠️标记项汇总）
+表格
+功能位置	当前问题	建议扩展方案
+绑定支付宝账号	无独立绑定接口	在 UserInfoVO 中已有 alipayAccount 字段，需增加 POST /api/user/bindAlipay 接口
+修改手机号	无换绑手机接口	需增加 POST /api/user/updatePhone 接口（需短信验证码）
+实名认证状态查询	realNameVerified 字段在profile中已返回	无需额外接口，直接读取 UserInfoVO.realNameVerified
+订单详情页	需展示订单完整信息	已有 GET /api/order/{orderNo}，但需确认是否包含物流信息字段
+头像预览/裁剪	当前直接上传原图	如需裁剪，前端可先裁剪再上传，或扩展OSS服务端裁剪参数
+页面模块与接口调用时机建议
+表格
+页面模块	初始化时调用	用户操作时调用	轮询刷新
+用户信息卡片	GET /api/user/profile	POST /api/user/update（修改）、POST /api/user/uploadAvatar（换头像）	每次进入页面
+模拟资产总览	GET /api/simulation/account/overview	点击刷新按钮重新调用	每30秒（可选）
+我的持仓	GET /api/simulation/position/list + GET /api/simulation/position/profit	切换品种时调用 GET /api/simulation/position/{metalType}	每30秒（可选）
+交易记录	GET /api/simulation/trade/history?page=1&size=10	翻页、筛选时重新调用	交易完成后主动刷新
+资金流水	GET /api/simulation/account/flow?page=1&size=10	翻页、筛选时重新调用	不轮询
+交易统计	GET /api/simulation/account/statistics	-	每次进入页面
+我的订单	GET /api/order/list?page=1&size=10	筛选状态、翻页时重新调用	每30秒（待支付订单倒计时）
+我的排名	GET /api/simulation/leaderboard/my-rank	点击刷新按钮重新调用	每60秒（可选）

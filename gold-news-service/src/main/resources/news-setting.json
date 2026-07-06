@@ -1,0 +1,12 @@
+{
+  "analysis": {
+    "analyzer": {
+      "ik_max_word": {
+        "type": "standard"
+      },
+      "ik_smart": {
+        "type": "standard"
+      }
+    }
+  }
+}

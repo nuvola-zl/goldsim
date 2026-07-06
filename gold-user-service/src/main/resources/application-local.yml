@@ -1,0 +1,67 @@
+server:
+  port: 8081
+
+spring:
+  sql:
+    init:
+      dependency-detection: false
+  config:
+    import: optional:nacos:gold-user-service.yaml?refresh=true
+  application:
+    name: gold-user-service
+
+  # ✅ 下面这些都必须是 spring 的子项，和 config/application 对齐
+  datasource:
+    url: jdbc:mysql://localhost:3306/goldsim?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      host: 192.168.153.129
+      port: 6379
+      database: 0
+
+  rabbitmq:
+    host: 192.168.153.129
+    port: 5672
+    username: goldsim
+    password: '123'
+    virtual-host: /goldsim
+    listener:
+      simple:
+        acknowledge-mode: auto
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1000ms
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.153.129:8848
+      config:
+        server-addr: 192.168.153.129:8848
+        file-extension: yaml
+        import-check:
+          enabled: false
+
+sa-token:
+  token-name: Authorization
+  timeout: 86400
+  active-timeout: 1800
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-read-cookie: false
+  is-read-header: true
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  level:
+    com.gold: debug

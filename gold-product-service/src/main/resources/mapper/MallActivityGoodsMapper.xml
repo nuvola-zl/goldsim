@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gold.product.mapper.MallActivityGoodsMapper">
+
+    <update id="increaseSoldCount">
+        UPDATE mall_activity_goods
+        SET sold_count = sold_count + #{quantity}
+        WHERE activity_id = #{activityId}
+          AND spec_id = #{specId}
+          AND (activity_stock - sold_count) >= #{quantity}
+    </update>
+
+    <update id="decreaseSoldCount">
+        UPDATE mall_activity_goods
+        SET sold_count = sold_count - #{quantity}
+        WHERE activity_id = #{activityId}
+          AND spec_id = #{specId}
+          AND sold_count >= #{quantity}
+    </update>
+
+</mapper>

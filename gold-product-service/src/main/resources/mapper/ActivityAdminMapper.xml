@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gold.product.mapper.ActivityAdminMapper">
+
+    <select id="selectActivityAdminPage" resultType="com.gold.mallApi.domain.vo.ActivityAdminListVO">
+        SELECT
+        a.id as activity_id,
+        a.activity_name,
+        a.start_time,
+        a.end_time,
+        a.status,
+        a.create_time,
+        (SELECT COUNT(*) FROM mall_activity_goods ag WHERE ag.activity_id = a.id) as goods_count,
+        (SELECT COALESCE(SUM(ag.sold_count), 0) FROM mall_activity_goods ag WHERE ag.activity_id = a.id) as total_sold
+        FROM mall_activity a
+        <where>
+            <if test="activityName != null and activityName != ''">
+                AND a.activity_name LIKE CONCAT('%', #{activityName}, '%')
+            </if>
+            <if test="status != null">
+                AND a.status = #{status}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <select id="selectActivityGoodsByActivityId" resultType="com.gold.mallApi.domain.vo.ActivityGoodsAdminVO">
+        SELECT
+            ag.id as activityGoodsId,
+            ag.spec_id,
+            s.goods_id as goodsId,
+            g.goods_name,
+            s.weight,
+            ag.original_price,
+            ag.activity_price,
+            ag.activity_stock,
+            ag.sold_count,
+            ag.limit_per_user,
+            ag.create_time
+        FROM mall_activity_goods ag
+                 INNER JOIN mall_goods_spec s ON ag.spec_id = s.id
+                 INNER JOIN mall_goods g ON s.goods_id = g.id
+        WHERE ag.activity_id = #{activityId}
+        ORDER BY ag.create_time ASC
+    </select>
+
+</mapper>
